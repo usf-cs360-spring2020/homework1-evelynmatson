@@ -1,5 +1,8 @@
-/*
+/**
  * This function converts date values during csv import
+ * @param row the row object to convert
+ * @param index who knows! I think this is required
+ * @returns the converted row
  */
 let convertRow = function(row, index) {
     out = {};
@@ -11,26 +14,29 @@ let convertRow = function(row, index) {
     return out;
 }
 
-/*
- * This function will load the csv from disk for the 1st visualization
+/**
+ * This function will draw the first visualization.
  */
-let loadDataOne = function() {
-    let csv = d3.csv("1 2018 enplaned per month by region summary.csv", convertRow).then(function(data) {
-        rows = [];
-        for (let element of data) {
-            row = {};
+let visualizationOne = function() {
+    let csv = d3.csv("1 2018 enplaned per month by region summary.csv", convertRow).then(drawOne);
+    // After this promise is loaded, send it in to drawOne().
 
-            row["month"] = convertActivityPeriod(element["Activity Period"]);
-            row["passenger count"] = element["Passenger Count"];
-            row["geo"] = element["GEO Summary"];
-             // console.log(row);
-            rows.
-      }
-    });
-
-    console.log(csv);
+    // console.log(csv);
 }
 
+/**
+ * Draw the actual visualization number one
+ * @param data the data loaded from csv to use in the visualization
+ */
+let drawOne = function(data) {
+    console.log(data);
+}
+
+/**
+ * This function converts a date in YYYYMM form to a Date object
+ * @param monthstring the date string in YYYYMM format
+ * @returns {Date} Date object that represents the correct month
+ */
 let convertActivityPeriod = function(monthstring) {
     let parseDate = d3.timeParse('%Y%m');
     let date = parseDate(monthstring);
