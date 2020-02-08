@@ -5,6 +5,8 @@ let config = {
     'margin': {},
     'plot': {}
 };
+let svg;
+let axes;
 
 /**
  * This function converts date values during csv import
@@ -17,7 +19,7 @@ let convertRow = function(row, index) {
 
     out["month"] = convertActivityPeriod(row["Activity Period"]);
     out["geo"] = row["GEO Region"];
-    out["passenger count"] = row["Passenger Count"];
+    out["passenger count"] = parseInt(row["Passenger Count"]);
 
     return out;
 };
@@ -48,7 +50,7 @@ let visualizationOne = function() {
     config.plot.paddingbetweenRegions = 10;
 
     // Set up the SVG
-    let svg = d3.select("#one");
+    svg = d3.select("#one");
     svg.attr("width", config.svg.width);
     svg.attr("height", config.svg.height);
 
@@ -81,7 +83,7 @@ let visualizationOne = function() {
     // TODO color scale
 
     // Setup axes
-    let axes = {};
+    axes = {};
     // TODO Make the axes
 
     // TODO make ticks
@@ -99,8 +101,12 @@ let visualizationOne = function() {
 let drawOne = function(data) {
     console.log(data);
 
+    // TODO sort it a good way
+
     // Work on scales
     scales.passengers.range([0,scales.month.bandwidth() - config.plot.paddingbetweenRegions]);
+    let maxPassengers = Math.max(... data.map(row => row['passenger count']));
+    scales.passengers.domain([0,maxPassengers]);
 
     let regions = data.map(row => row['geo']).unique();
     scales.regions.domain(regions);
@@ -110,7 +116,12 @@ let drawOne = function(data) {
         .map(row => row['month']);
     scales.month.domain(dates);
 
-
+    // Draw some axes! Yay!
+    let gx = svg.append('g');
+    gx.attr("id", "x-axis");
+    gx.attr("class", "axis");
+    gx.attr("transform", translate(config.plot.x, config.plot.y + config.plot.height));
+    gx.call(axes.x);
 
 };
 
