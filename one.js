@@ -5,24 +5,26 @@
  * @returns the converted row
  */
 let convertRow = function(row, index) {
-    out = {};
+    let out = {};
 
     out["month"] = convertActivityPeriod(row["Activity Period"]);
     out["passenger count"] = row["Passenger Count"];
     out["geo"] = row["GEO Summary"];
 
     return out;
-}
+};
 
 /**
  * This function will draw the first visualization.
  */
 let visualizationOne = function() {
+    // Set up the SVG
+    let svg = d3.select();
+
+    // Load the data
     let csv = d3.csv("1 2018 enplaned per month by region summary.csv", convertRow).then(drawOne);
     // After this promise is loaded, send it in to drawOne().
-
-    // console.log(csv);
-}
+};
 
 /**
  * Draw the actual visualization number one
@@ -30,7 +32,7 @@ let visualizationOne = function() {
  */
 let drawOne = function(data) {
     console.log(data);
-}
+};
 
 /**
  * This function converts a date in YYYYMM form to a Date object
@@ -39,11 +41,9 @@ let drawOne = function(data) {
  */
 let convertActivityPeriod = function(monthstring) {
     let parseDate = d3.timeParse('%Y%m');
-    let date = parseDate(monthstring);
-
-    return date;
+    return parseDate(monthstring);
     // console.log(date);
 
-}
+};
 
-loadDataOne();
+visualizationOne();
