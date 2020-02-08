@@ -7,6 +7,7 @@ let config = {
 };
 let svg;
 let axes;
+let plot;
 
 /**
  * This function converts date values during csv import
@@ -55,7 +56,7 @@ let visualizationOne = function() {
     svg.attr("height", config.svg.height);
 
     // Set up svg plot area
-    let plot = svg.append('g');
+    plot = svg.append('g');
     plot.attr('id', 'plot1');
     plot.attr('transform', translate(config.plot.x, config.plot.y));
 
@@ -66,7 +67,7 @@ let visualizationOne = function() {
     rect.attr('y', 0);
     rect.attr('width', config.plot.width);
     rect.attr('height', config.plot.height);
-    rect.style("fill", "linen");
+    rect.style("fill", "pink");
 
     // Make some scales!
     // Month scale (y)
@@ -121,8 +122,37 @@ let drawOne = function(data) {
     gx.attr("id", "x-axis");
     gx.attr("class", "axis");
     gx.attr("transform", translate(config.plot.x, config.plot.y + config.plot.height));
-    gx.call(axes.x);
+    // gx.call(axes.x);
 
+    // TODO actually draw axes
+
+    // TODO fix everything after this
+    // Process some data
+    let regionPlots = plot.selectAll("g.regionPlot")
+        .data(data)
+        .enter()
+        .append("g");
+    // TODO this is probably wrong. I probably need to split up the data to treat each region differently
+
+    regionPlots.attr("class", "cell");
+    regionPlots.attr("id", d => "Region-" + d["geo"]);
+
+    regionPlots.attr("transform", function(d) {
+       return translate(scales.regions(d["geo"]))
+    });
+
+    let cells = regionPlots.selectAll("rect")
+        .data(d => d.passengers)
+        .enter()        // TODO i definitely have to split things up here
+        .append("rect");
+
+    cells.attr("x", 0);
+    cells.attr("y", d => scales.month(d["month"]));
+    cells.attr("width", d => scales.passengers(d["passengers"]));
+    cells.attr("height", scales.month.bandwidth());
+
+    cells.style("fill", "green");
+    cells.style("stroke", "black");
 };
 
 /**
