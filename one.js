@@ -1,4 +1,5 @@
-// import * as d3 from "d3.v5";
+// Global variables because why not
+let scales = {};
 
 /**
  * This function converts date values during csv import
@@ -10,8 +11,8 @@ let convertRow = function(row, index) {
     let out = {};
 
     out["month"] = convertActivityPeriod(row["Activity Period"]);
-    out["passenger count"] = row["Passenger Count"];
     out["geo"] = row["GEO Region"];
+    out["passenger count"] = row["Passenger Count"];
 
     return out;
 };
@@ -61,10 +62,25 @@ let visualizationOne = function() {
     rect.attr('y', 0);
     rect.attr('width', config.plot.width);
     rect.attr('height', config.plot.height);
+    rect.style("fill", "linen");
 
     // Make some scales!
-    let scales = {};
+    // Month scale (y)
+    scales.month = d3.scaleBand()
+        .range(0, config.plot.height);
 
+    scales.passengers = d3.scaleLinear()
+        .rangeRound([0, config.plot.width]);
+
+    // TODO Region scale (x)
+
+    // TODO color scale
+
+    // Setup axes
+    let axes = {};
+    // TODO Make the axes
+
+    // TODO make ticks
 
 
     // Load the data
@@ -78,6 +94,18 @@ let visualizationOne = function() {
  */
 let drawOne = function(data) {
     console.log(data);
+
+    // Work on scales
+    let regions = new Set(data.map(row => row['geo']));     // Set for uniqueness
+    // console.log(regions);
+    let dates = new Set(data
+        .filter(
+            row => (row['geo'] === data[0]['geo']))     // Take only the first geo region's months
+        .map(row => row['month']));
+    // console.log(dates);
+
+    scales.month.domain(dates);
+
 };
 
 /**

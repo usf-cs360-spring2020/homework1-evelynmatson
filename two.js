@@ -11,7 +11,7 @@ let convertRow = function(row, index) {
 
     out["month"] = convertActivityPeriod(row["Activity Period"]);
     out["passenger count"] = row["Passenger Count"];
-    out["geo"] = row["GEO Region"];
+    out["terminal"] = row["Terminal"];
 
     return out;
 };
@@ -68,7 +68,7 @@ let visualizationOne = function() {
 
 
     // Load the data
-    let csv = d3.csv("2 2018 enplaned per region per month.csv", convertRow).then(drawOne);
+    let csv = d3.csv("3 terminals.csv", convertRow).then(drawOne);
     // After this promise is loaded, send it in to drawOne().
 };
 
