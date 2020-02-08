@@ -1,5 +1,10 @@
 // Global variables because why not
 let scales = {};
+let config = {
+    'svg': {},
+    'margin': {},
+    'plot': {}
+};
 
 /**
  * This function converts date values during csv import
@@ -23,11 +28,6 @@ let convertRow = function(row, index) {
 let visualizationOne = function() {
 
     // Specs of the svg
-    let config = {
-        'svg': {},
-        'margin': {},
-        'plot': {}
-    };
     config.svg.height = 450;
     config.svg.width = config.svg.height * 1.618;   // Golden Ratio!
 
@@ -44,6 +44,8 @@ let visualizationOne = function() {
     // (Calculate the width and height of the plot area)
     config.plot.width = config.svg.width - config.margin.left - config.margin.right;
     config.plot.height = config.svg.height - config.margin.top - config.margin.bottom;
+
+    config.plot.paddingbetweenRegions = 10;
 
     // Set up the SVG
     let svg = d3.select("#one");
@@ -67,12 +69,14 @@ let visualizationOne = function() {
     // Make some scales!
     // Month scale (y)
     scales.month = d3.scaleBand()
-        .range(0, config.plot.height);
+        .rangeRound([0, config.plot.height]);
 
     scales.passengers = d3.scaleLinear()
+        // Will give a range later, when we know more about the data
+
+    scales.regions = d3.scaleBand()
         .rangeRound([0, config.plot.width]);
 
-    // TODO Region scale (x)
 
     // TODO color scale
 
@@ -96,15 +100,17 @@ let drawOne = function(data) {
     console.log(data);
 
     // Work on scales
-    let regions = new Set(data.map(row => row['geo']));     // Set for uniqueness
-    // console.log(regions);
-    let dates = new Set(data
-        .filter(
-            row => (row['geo'] === data[0]['geo']))     // Take only the first geo region's months
-        .map(row => row['month']));
-    // console.log(dates);
+    scales.passengers.range([0,scales.month.bandwidth() - config.plot.paddingbetweenRegions]);
 
+    let regions = data.map(row => row['geo']).unique();
+    scales.regions.domain(regions);
+
+    let dates = data
+        .filter(row => (row['geo'] === data[0]['geo']))     // Take only the first geo region's months
+        .map(row => row['month']);
     scales.month.domain(dates);
+
+
 
 };
 
@@ -113,6 +119,17 @@ let drawOne = function(data) {
   */
 function translate(x, y) {
     return 'translate(' + x + ',' + y + ')';
+}
+
+/**
+ * Helpful unique-ing function
+ * @returns {*[]} an array with only the unique elements of the array it was called on
+ * @source https://coderwall.com/p/nilaba/simple-pure-javascript-array-unique-method-with-5-lines-of-code
+ */
+Array.prototype.unique = function() {
+    return this.filter(function (value, index, self) {
+        return self.indexOf(value) === index;
+    });
 }
 
 /**
