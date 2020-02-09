@@ -32,7 +32,7 @@ let visualizationOne = function() {
 
     // Specs of the svg
     config.svg.height = 450;
-    config.svg.width = config.svg.height * 1.618;   // Golden Ratio!
+    config.svg.width = 900;   // Golden Ratio!
 
     // svg margins
     config.margin.top = 10;
@@ -48,7 +48,7 @@ let visualizationOne = function() {
     config.plot.width = config.svg.width - config.margin.left - config.margin.right;
     config.plot.height = config.svg.height - config.margin.top - config.margin.bottom;
 
-    config.plot.paddingBetweenRegions = 2;
+    config.plot.paddingBetweenRegions = .2;
     config.plot.paddingBetweenMonths = .05;
 
     // Set up the SVG
@@ -72,6 +72,7 @@ let visualizationOne = function() {
 
     // Make some scales!
     // Month scale (y)
+    console.log("height is :", config.plot.height);
     scales.month = d3.scaleBand()
         .rangeRound([0, config.plot.height])
         .paddingInner(config.plot.paddingBetweenMonths);
@@ -79,6 +80,7 @@ let visualizationOne = function() {
     scales.passengers = d3.scaleLinear();
         // Will give a range later, when we know more about the data
 
+    console.log("width is :", config.plot.width);
     scales.regions = d3.scaleBand()
         .rangeRound([0, config.plot.width])
         .paddingInner(config.plot.paddingBetweenRegions);
@@ -106,26 +108,29 @@ let visualizationOne = function() {
  */
 let drawOne = function(data) {
 
-    data = data.filter(d => d['geo'] != 'US'); // Filter out US data because it's too large
+    data = data.filter(d => d['geo'] !== 'US'); // Filter out US data because it's too large
 
     // TODO sort it a good way
 
     // Work on scales
-
-    let regions = data.map(row => row['geo']).unique();
-    scales.regions.domain(regions);
-    console.log("Regions bandwidth is :", scales.regions.bandwidth());
 
     let dates = data
         .filter(row => (row['geo'] === data[0]['geo']))     // Take only the first geo region's months
         .map(row => row['month'])
         .sort(function(a,b) {return a - b;});
     scales.month.domain(dates);
+    // console.log(dates);
     console.log("Months bandwidth is :", scales.month.bandwidth());
+
+    let regions = data.map(row => row['geo']).unique();
+    scales.regions.domain(regions);       // TODO wrong!
+    // console.log(regions);
+    console.log("Regions bandwidth is :", scales.regions.bandwidth());
 
     let maxPassengers = Math.max(... data.map(row => row['passengers']));
     scales.passengers.domain([0,maxPassengers])
-        .range([0, scales.month.bandwidth()]);
+        .range([0, scales.regions.bandwidth()]);
+    console.log("Max passengers is :", maxPassengers);
 
     // TODO actually draw axes
 
