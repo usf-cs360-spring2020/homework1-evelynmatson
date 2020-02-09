@@ -20,7 +20,7 @@ let convertRow = function(row, index) {
 
     out["month"] = convertActivityPeriod(row["Activity Period"]);
     out["geo"] = row["GEO Region"];
-    out["passenger count"] = parseInt(row["Passenger Count"]);
+    out["passengers"] = parseInt(row["Passenger Count"]);
 
     return out;
 };
@@ -106,7 +106,7 @@ let drawOne = function(data) {
 
     // Work on scales
     scales.passengers.range([0,scales.month.bandwidth() - config.plot.paddingbetweenRegions]);
-    let maxPassengers = Math.max(... data.map(row => row['passenger count']));
+    let maxPassengers = Math.max(... data.map(row => row['passengers']));
     scales.passengers.domain([0,maxPassengers]);
 
     let regions = data.map(row => row['geo']).unique();
@@ -128,31 +128,55 @@ let drawOne = function(data) {
 
     // TODO fix everything after this
     // Process some data
-    let regionPlots = plot.selectAll("g.regionPlot")
-        .data(data)
-        .enter()
-        .append("g");
-    // TODO this is probably wrong. I probably need to split up the data to treat each region differently
+    // let regionPlots = plot.selectAll("g.regionPlot")
+    //     .data(data)
+    //     .enter()
+    //     .append("g");
+    // // TODO this is probably wrong. I probably need to split up the data to treat each region differently
+    //
+    // regionPlots.attr("class", "cell");
+    // regionPlots.attr("id", d => "Region-" + d["geo"]);
+    //
+    // regionPlots.attr("transform", function(d) {
+    //    return translate(scales.regions(d["geo"]))
+    // });
+    //
+    // let cells = regionPlots.selectAll("rect")
+    //     .data(d => d.passengers)
+    //     .enter()        // TODO i definitely have to split things up here
+    //     .append("rect");
+    //
+    // cells.attr("x", 0);
+    // cells.attr("y", d => scales.month(d["month"]));
+    // cells.attr("width", d => scales.passengers(d["passengers"]));
+    // cells.attr("height", scales.month.bandwidth());
+    //
+    // cells.style("fill", "green");
+    // cells.style("stroke", "black");
 
-    regionPlots.attr("class", "cell");
-    regionPlots.attr("id", d => "Region-" + d["geo"]);
+    // Testing drawing just one:
+    let rect = d3.select("#background1");
+    console.assert(rect.size() == 1); // Make sure we just have one thing
 
-    regionPlots.attr("transform", function(d) {
-       return translate(scales.regions(d["geo"]))
-    });
+    // Get data as key value pairs before binding (pick just region for testing)
+    let justOneRegion = data.filter(d => d["geo"] === regions[1]);
+    justOneRegion = justOneRegion.sort
+    console.log(justOneRegion);
 
-    let cells = regionPlots.selectAll("rect")
-        .data(d => d.passengers)
-        .enter()        // TODO i definitely have to split things up here
-        .append("rect");
+    let things = plot.selectAll(".iAmConfused")
+        .data(justOneRegion, function(d) {return d["month"]});
 
-    cells.attr("x", 0);
-    cells.attr("y", d => scales.month(d["month"]));
-    cells.attr("width", d => scales.passengers(d["passengers"]));
-    cells.attr("height", scales.month.bandwidth());
+    things.enter()
+        .append("rect")
+        .attr("class","iAmConfused")
+        .attr("width", d => scales.passengers(d["passengers"]))
+        .attr("x", d => scales.regions(d["geo"]))
+        .attr("y", d => scales.month(d["month"]))
+        .attr("height", scales.month.bandwidth())
+        .each(function(d, i, nodes) {
+            console.log("Did a thing for :", d["month"]);
+        });
 
-    cells.style("fill", "green");
-    cells.style("stroke", "black");
 };
 
 /**
