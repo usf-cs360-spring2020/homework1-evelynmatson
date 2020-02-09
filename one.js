@@ -85,7 +85,7 @@ let visualizationOne = function() {
 
     // Setup axes
     axes = {};
-    axes.months = d3.axisLeft(scale.months);
+    axes.months = d3.axisLeft(scales.months);
     // TODO Make the axes
 
     // TODO make ticks
@@ -101,7 +101,7 @@ let visualizationOne = function() {
  * @param data the data loaded from csv to use in the visualization
  */
 let drawOne = function(data) {
-    console.log(data);
+    // console.log(data);
 
     // TODO sort it a good way
 
@@ -115,10 +115,14 @@ let drawOne = function(data) {
 
     let dates = data
         .filter(row => (row['geo'] === data[0]['geo']))     // Take only the first geo region's months
-        .map(row => row['month'])
-        .sort(function(a,b) {
-            return a["month"] - b["month"]
-        });
+        .map(row => row['month']);
+    console.log(dates);
+
+    dates = dates.sort(function(a,b) {
+        return a - b;
+    });
+
+    console.log(dates);
     scales.month.domain(dates);
 
     // Draw some axes! Yay!
@@ -186,7 +190,7 @@ let drawOne = function(data) {
         .attr("y", d => scales.month(d["month"]))
         .attr("height", scales.month.bandwidth())
         .each(function(d, i, nodes) {
-            console.log("Did a thing for :", d["month"]);
+            console.log("Did a thing for :", d["month"], "with value :", d["passengers"], "at y location :", scales.month(d["month"]));
         });
 
 };
