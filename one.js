@@ -35,7 +35,7 @@ let visualizationOne = function() {
     config.svg.width = 900;   // Golden Ratio!
 
     // svg margins
-    config.margin.top = 10;
+    config.margin.top = 50;
     config.margin.right = 10;
     config.margin.bottom = 10;
     config.margin.left = 70;
@@ -111,10 +111,7 @@ let drawOne = function(data) {
     data = data
         .filter(d => d['geo'] !== 'US'); // Filter out US data because it's too large
 
-    // TODO sort it a good way
-
     // Work on scales
-
     let dates = data
         .filter(row => (row['geo'] === data[0]['geo']))     // Take only the first geo region's months
         .map(row => row['month'])
@@ -122,28 +119,9 @@ let drawOne = function(data) {
     scales.month.domain(dates);
     console.log("Months bandwidth is :", scales.month.bandwidth());
 
-    /**
-     * Finds the largest passenger count for any month for region in data entry a
-     * @param a
-     * @returns {number}
-     */
-    let maxOfRegion = function (a) {
-        // console.log("chicken :", a);
-
-        let filteredData = data
-            .filter(d => (d['geo'] === a['geo']))
-            .map(d => d['passengers']);
-        // console.log(filteredData);
-
-        let toReturn = Math.max(...filteredData);
-
-        // console.log("Found largest for region :", a['geo'], toReturn);
-
-        return toReturn;
-    };
     let regions = data
         .sort(function(a, b) {
-            return maxOfRegion(b) - maxOfRegion(a);
+            return maxOfRegion(b, data) - maxOfRegion(a, data);
         })
         .map(row => row['geo'])
         .unique();
@@ -160,57 +138,23 @@ let drawOne = function(data) {
 
     // TODO actually draw axes
 
-    // TODO fix everything after this
-    // Process some data
-    // let regionPlots = plot.selectAll("g.regionPlot")
-    //     .data(data)
-    //     .enter()
-    //     .append("g");
-    // // TODO this is probably wrong. I probably need to split up the data to treat each region differently
-    //
-    // regionPlots.attr("class", "cell");
-    // regionPlots.attr("id", d => "Region-" + d["geo"]);
-    //
-    // regionPlots.attr("transform", function(d) {
-    //    return translate(scales.regions(d["geo"]))
-    // });
-    //
-    // let cells = regionPlots.selectAll("rect")
-    //     .data(d => d.passengers)
-    //     .enter()        // TODO i definitely have to split things up here
-    //     .append("rect");
-    //
-    // cells.attr("x", 0);
-    // cells.attr("y", d => scales.month(d["month"]));
-    // cells.attr("width", d => scales.passengers(d["passengers"]));
-    // cells.attr("height", scales.month.bandwidth());
-    //
-    // cells.style("fill", "green");
-    // cells.style("stroke", "black");
-
-    // Testing drawing just one:
     let rect = d3.select("#background1");
-    console.assert(rect.size() == 1); // Make sure we just have one thing
+    console.assert(rect.size() === 1); // Make sure we just have one thing
 
-    // Get data as key value pairs before binding (pick just region for testing)
-    // let justOneRegion = data.filter(d => d["geo"] === regions[1]);
-    // console.log(justOneRegion);
-
-    let things = plot.selectAll(".iAmConfused")
+    let things = plot.selectAll(".bars")
         .data(data, function(d) {return d["month"]});
 
+    // Draw new bars for entering data
     things.enter()
         .append("rect")
-        .attr("class","iAmConfused")
+        .attr("class","bars")
         .attr("width", d => scales.passengers(d["passengers"]))
         .attr("x", d => scales.regions(d["geo"]))
         .attr("y", d => scales.month(d["month"]))
         .attr("height", scales.month.bandwidth());
-        // .each(function(d, i, nodes) {
-        //     console.log("Did a thing for :", monthsFormatter(d["month"]), "with value :", d["passengers"], "at x location :", scales.regions(d["geo"]))});
 
 
-    // Set up axes later because maybe that will help
+    // Finally, set up axes
     let monthsAxis = d3.axisLeft(scales.month)
         .tickPadding(0)
         .tickFormat(monthsFormatter);
@@ -221,12 +165,14 @@ let drawOne = function(data) {
         .attr("class", "axis");
     monthsAxisGroup.call(monthsAxis);
 
-    function monthsFormatter(d) {
-        const monthNames = ["January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ];  // From https://stackoverflow.com/questions/1643320/get-month-name-from-date
-        return monthNames[d.getMonth()];
-    }
+    let regionsAxis = d3.axisTop(scales.regions)
+        .tickPadding(0);
+    axes.regions = regionsAxis;
+
+    let regionsAxisGroup = plot.append("g")
+        .attr("id", "regions-axis")
+        .attr("class", "axis");
+    regionsAxisGroup.call(regionsAxis);
 };
 
 /**
@@ -234,6 +180,16 @@ let drawOne = function(data) {
   */
 function translate(x, y) {
     return 'translate(' + x + ',' + y + ')';
+}
+
+/*
+ * Convert a data entry to a nice month name
+ */
+function monthsFormatter(d) {
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];  // From https://stackoverflow.com/questions/1643320/get-month-name-from-date
+    return monthNames[d.getMonth()];
 }
 
 /**
@@ -245,18 +201,26 @@ Array.prototype.unique = function() {
     return this.filter(function (value, index, self) {
         return self.indexOf(value) === index;
     });
-}
+};
 
 /**
  * This function converts a date in YYYYMM form to a Date object
  * @param monthstring the date string in YYYYMM format
  * @returns {Date} Date object that represents the correct month
  */
-let convertActivityPeriod = function(monthstring) {
+function convertActivityPeriod(monthstring) {
     let parseDate = d3.timeParse('%Y%m');
     return parseDate(monthstring);
     // console.log(date);
+}
 
-};
+/*
+ * Finds the largest passenger count for any month for region in data entry a
+ */
+function maxOfRegion(a, data) {
+    return Math.max(...data
+        .filter(d => (d['geo'] === a['geo']))
+        .map(d => d['passengers']));
+}
 
 visualizationOne();
