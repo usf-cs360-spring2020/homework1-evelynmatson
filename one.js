@@ -19,7 +19,7 @@ let visualizationOne = function() {
     config.svg.width = 900;   // Golden Ratio!
 
     // svg margins
-    config.margin.top = 50;
+    config.margin.top = 70;
     config.margin.right = 10;
     config.margin.bottom = 40;
     config.margin.left = 70;
@@ -52,7 +52,7 @@ let visualizationOne = function() {
     rect.attr('y', 0);
     rect.attr('width', config.plot.width);
     rect.attr('height', config.plot.height);
-    rect.style("fill", "pink");
+    // rect.style("fill", "pink");
 
     // Make some scales!
     // Month scale (y)
