@@ -108,7 +108,8 @@ let visualizationOne = function() {
  */
 let drawOne = function(data) {
 
-    data = data.filter(d => d['geo'] !== 'US'); // Filter out US data because it's too large
+    data = data
+        .filter(d => d['geo'] !== 'US'); // Filter out US data because it's too large
 
     // TODO sort it a good way
 
@@ -119,13 +120,38 @@ let drawOne = function(data) {
         .map(row => row['month'])
         .sort(function(a,b) {return a - b;});
     scales.month.domain(dates);
-    // console.log(dates);
     console.log("Months bandwidth is :", scales.month.bandwidth());
 
-    let regions = data.map(row => row['geo']).unique();
-    scales.regions.domain(regions);       // TODO wrong!
-    // console.log(regions);
+    /**
+     * Finds the largest passenger count for any month for region in data entry a
+     * @param a
+     * @returns {number}
+     */
+    let maxOfRegion = function (a) {
+        // console.log("chicken :", a);
+
+        let filteredData = data
+            .filter(d => (d['geo'] === a['geo']))
+            .map(d => d['passengers']);
+        // console.log(filteredData);
+
+        let toReturn = Math.max(...filteredData);
+
+        // console.log("Found largest for region :", a['geo'], toReturn);
+
+        return toReturn;
+    };
+    let regions = data
+        .sort(function(a, b) {
+            return maxOfRegion(b) - maxOfRegion(a);
+        })
+        .map(row => row['geo'])
+        .unique();
+
+    console.log(regions);
+    scales.regions.domain(regions);
     console.log("Regions bandwidth is :", scales.regions.bandwidth());
+
 
     let maxPassengers = Math.max(... data.map(row => row['passengers']));
     scales.passengers.domain([0,maxPassengers])
@@ -179,9 +205,9 @@ let drawOne = function(data) {
         .attr("width", d => scales.passengers(d["passengers"]))
         .attr("x", d => scales.regions(d["geo"]))
         .attr("y", d => scales.month(d["month"]))
-        .attr("height", scales.month.bandwidth())
-        .each(function(d, i, nodes) {
-            console.log("Did a thing for :", monthsFormatter(d["month"]), "with value :", d["passengers"], "at x location :", scales.regions(d["geo"]))});
+        .attr("height", scales.month.bandwidth());
+        // .each(function(d, i, nodes) {
+        //     console.log("Did a thing for :", monthsFormatter(d["month"]), "with value :", d["passengers"], "at x location :", scales.regions(d["geo"]))});
 
 
     // Set up axes later because maybe that will help
