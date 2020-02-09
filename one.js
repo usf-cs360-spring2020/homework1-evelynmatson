@@ -70,6 +70,8 @@ let visualizationOne = function() {
         .rangeRound([0, config.plot.width])
         .paddingInner(config.plot.paddingBetweenRegions);
 
+    scales.color = d3.scaleOrdinal(d3.schemeCategory10);
+
 
     // TODO color scale
 
@@ -110,11 +112,14 @@ let drawOne = function(data) {
         })
         .map(row => row['geo'])
         .unique();
-    console.log(regions);
+    // console.log(regions);
 
     // console.log(regions);
     scales.regions.domain(regions);
+    scales.color.domain(regions);
     // console.log("Regions bandwidth is :", scales.regions.bandwidth());
+
+
 
 
     let maxPassengers = Math.max(... data.map(row => row['passengers']));
@@ -137,7 +142,9 @@ let drawOne = function(data) {
         .attr("width", d => scales.passengers(d["passengers"]))
         .attr("x", d => scales.regions(d["geo"]))
         .attr("y", d => scales.month(d["month"]))
-        .attr("height", scales.month.bandwidth());
+        .attr("height", scales.month.bandwidth())
+        .style("fill", d => scales.color(d['geo']))
+        .style('stroke', 'white');
 
 
     // Finally, set up axes
