@@ -38,7 +38,7 @@ let visualizationOne = function() {
     config.margin.top = 10;
     config.margin.right = 10;
     config.margin.bottom = 10;
-    config.margin.left = 10;
+    config.margin.left = 70;
 
     // Plot specs
     // (Move the plot right and down by the margin amounts)
@@ -48,7 +48,8 @@ let visualizationOne = function() {
     config.plot.width = config.svg.width - config.margin.left - config.margin.right;
     config.plot.height = config.svg.height - config.margin.top - config.margin.bottom;
 
-    config.plot.paddingbetweenRegions = 10;
+    config.plot.paddingBetweenRegions = 2;
+    config.plot.paddingBetweenMonths = .05;
 
     // Set up the SVG
     svg = d3.select("#one");
@@ -72,20 +73,23 @@ let visualizationOne = function() {
     // Make some scales!
     // Month scale (y)
     scales.month = d3.scaleBand()
-        .rangeRound([0, config.plot.height]);
+        .rangeRound([0, config.plot.height])
+        .paddingInner(config.plot.paddingBetweenMonths);
 
-    scales.passengers = d3.scaleLinear()
+    scales.passengers = d3.scaleLinear();
         // Will give a range later, when we know more about the data
 
     scales.regions = d3.scaleBand()
-        .rangeRound([0, config.plot.width]);
+        .rangeRound([0, config.plot.width])
+        .paddingInner(config.plot.paddingBetweenRegions);
 
 
     // TODO color scale
 
     // Setup axes
     axes = {};
-    axes.months = d3.axisLeft(scales.months);
+
+
     // TODO Make the axes
 
     // TODO make ticks
@@ -101,42 +105,27 @@ let visualizationOne = function() {
  * @param data the data loaded from csv to use in the visualization
  */
 let drawOne = function(data) {
-    // console.log(data);
+
+    data = data.filter(d => d['geo'] != 'US'); // Filter out US data because it's too large
 
     // TODO sort it a good way
 
     // Work on scales
-    scales.passengers.range([0,scales.month.bandwidth() - config.plot.paddingbetweenRegions]);
-    let maxPassengers = Math.max(... data.map(row => row['passengers']));
-    scales.passengers.domain([0,maxPassengers]);
 
     let regions = data.map(row => row['geo']).unique();
     scales.regions.domain(regions);
+    console.log("Regions bandwidth is :", scales.regions.bandwidth());
 
     let dates = data
         .filter(row => (row['geo'] === data[0]['geo']))     // Take only the first geo region's months
-        .map(row => row['month']);
-    console.log(dates);
-
-    dates = dates.sort(function(a,b) {
-        return a - b;
-    });
-
-    console.log(dates);
+        .map(row => row['month'])
+        .sort(function(a,b) {return a - b;});
     scales.month.domain(dates);
+    console.log("Months bandwidth is :", scales.month.bandwidth());
 
-    // Draw some axes! Yay!
-    let gx = svg.append('g');
-    gx.attr("id", "x-axis");
-    gx.attr("class", "axis");
-    gx.attr("transform", translate(config.plot.x, config.plot.y + config.plot.height));
-    // gx.call(axes.x);
-
-    let monthsAxis = svg.append('g')
-        .attr("id", "months-axis")
-        .attr("class", "axis")
-        // .attr("transform", translate(config.))
-
+    let maxPassengers = Math.max(... data.map(row => row['passengers']));
+    scales.passengers.domain([0,maxPassengers])
+        .range([0, scales.month.bandwidth()]);
 
     // TODO actually draw axes
 
@@ -173,14 +162,11 @@ let drawOne = function(data) {
     console.assert(rect.size() == 1); // Make sure we just have one thing
 
     // Get data as key value pairs before binding (pick just region for testing)
-    let justOneRegion = data.filter(d => d["geo"] === regions[1]);
-    justOneRegion = justOneRegion.sort(function(a,b) {
-        return a["month"] - b["month"]
-    });
-    console.log(justOneRegion);
+    // let justOneRegion = data.filter(d => d["geo"] === regions[1]);
+    // console.log(justOneRegion);
 
     let things = plot.selectAll(".iAmConfused")
-        .data(justOneRegion, function(d) {return d["month"]});
+        .data(data, function(d) {return d["month"]});
 
     things.enter()
         .append("rect")
@@ -190,9 +176,26 @@ let drawOne = function(data) {
         .attr("y", d => scales.month(d["month"]))
         .attr("height", scales.month.bandwidth())
         .each(function(d, i, nodes) {
-            console.log("Did a thing for :", d["month"], "with value :", d["passengers"], "at y location :", scales.month(d["month"]));
-        });
+            console.log("Did a thing for :", monthsFormatter(d["month"]), "with value :", d["passengers"], "at x location :", scales.regions(d["geo"]))});
 
+
+    // Set up axes later because maybe that will help
+    let monthsAxis = d3.axisLeft(scales.month)
+        .tickPadding(0)
+        .tickFormat(monthsFormatter);
+    axes.months = monthsAxis;
+
+    let monthsAxisGroup = plot.append("g")
+        .attr("id", "months-axis")
+        .attr("class", "axis");
+    monthsAxisGroup.call(monthsAxis);
+
+    function monthsFormatter(d) {
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];  // From https://stackoverflow.com/questions/1643320/get-month-name-from-date
+        return monthNames[d.getMonth()];
+    }
 };
 
 /**
