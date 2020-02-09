@@ -85,6 +85,7 @@ let visualizationOne = function() {
 
     // Setup axes
     axes = {};
+    axes.months = d3.axisLeft(scale.months);
     // TODO Make the axes
 
     // TODO make ticks
@@ -114,7 +115,10 @@ let drawOne = function(data) {
 
     let dates = data
         .filter(row => (row['geo'] === data[0]['geo']))     // Take only the first geo region's months
-        .map(row => row['month']);
+        .map(row => row['month'])
+        .sort(function(a,b) {
+            return a["month"] - b["month"]
+        });
     scales.month.domain(dates);
 
     // Draw some axes! Yay!
@@ -123,6 +127,12 @@ let drawOne = function(data) {
     gx.attr("class", "axis");
     gx.attr("transform", translate(config.plot.x, config.plot.y + config.plot.height));
     // gx.call(axes.x);
+
+    let monthsAxis = svg.append('g')
+        .attr("id", "months-axis")
+        .attr("class", "axis")
+        // .attr("transform", translate(config.))
+
 
     // TODO actually draw axes
 
@@ -160,7 +170,9 @@ let drawOne = function(data) {
 
     // Get data as key value pairs before binding (pick just region for testing)
     let justOneRegion = data.filter(d => d["geo"] === regions[1]);
-    justOneRegion = justOneRegion.sort
+    justOneRegion = justOneRegion.sort(function(a,b) {
+        return a["month"] - b["month"]
+    });
     console.log(justOneRegion);
 
     let things = plot.selectAll(".iAmConfused")
