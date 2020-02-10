@@ -8,6 +8,7 @@ let config = {
 let svg;
 let axes;
 let plot;
+let grid;
 
 /**
  * This function will draw the first visualization.
@@ -19,9 +20,9 @@ let visualizationOne = function() {
     config.svg.width = 900;   // Golden Ratio!
 
     // svg margins
-    config.margin.top = 70;
+    config.margin.top = 25;
     config.margin.right = 10;
-    config.margin.bottom = 40;
+    config.margin.bottom = 30;
     config.margin.left = 70;
 
     // Plot specs
@@ -45,27 +46,29 @@ let visualizationOne = function() {
     plot.attr('id', 'plot1');
     plot.attr('transform', translate(config.plot.x, config.plot.y));
 
-    // Set up a rect inside the g
-    let rect = plot.append('rect');
-    rect.attr('id', 'background1');
-    rect.attr('x', 0);
-    rect.attr('y', 0);
-    rect.attr('width', config.plot.width);
-    rect.attr('height', config.plot.height);
-    // rect.style("fill", "pink");
+    // Set up a group for gridlines in the svg
+    grid = plot.append("g")
+        // .attr('transform', translate(config.plot.x, config.plot.y + config.plot.height))
+        // .attr('transform', translate(config.plot.x, config.plot.y))
+        .attr("class", "gridlines");
+
+    // Set up a rect inside the g for bars
+    let rect = plot.append('g')
+        .attr('id', 'bars')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', config.plot.width)
+        .attr('height', config.plot.height);
 
     // Make some scales!
     // Month scale (y)
-    // console.log("height is :", config.plot.height);
     scales.month = d3.scaleBand()
         .rangeRound([0, config.plot.height])
         .paddingInner(config.plot.paddingBetweenMonths);
 
-    scales.passengers = d3.scaleLinear()
-        .nice();
+    scales.passengers = d3.scaleLinear();
         // Will give a range later, when we know more about the data
 
-    // console.log("width is :", config.plot.width);
     scales.regions = d3.scaleBand()
         .rangeRound([0, config.plot.width])
         .paddingInner(config.plot.paddingBetweenRegions);
@@ -73,13 +76,9 @@ let visualizationOne = function() {
     scales.color = d3.scaleOrdinal(d3.schemeCategory10);
 
 
-    // TODO color scale
-
     // Setup axes
     axes = {};
 
-
-    // TODO Make the axes
 
     // TODO make ticks
 
@@ -104,7 +103,6 @@ let drawOne = function(data) {
         .map(row => row['month'])
         .sort(function(a,b) {return a - b;});
     scales.month.domain(dates);
-    // console.log("Months bandwidth is :", scales.month.bandwidth());
 
     let regions = data
         .sort(function(a, b) {
@@ -112,39 +110,14 @@ let drawOne = function(data) {
         })
         .map(row => row['geo'])
         .unique();
-    // console.log(regions);
-
-    // console.log(regions);
     scales.regions.domain(regions);
     scales.color.domain(regions);
-    // console.log("Regions bandwidth is :", scales.regions.bandwidth());
-
-
-
 
     let maxPassengers = Math.max(... data.map(row => row['passengers']));
     scales.passengers.domain([0,maxPassengers])
-        .range([0, scales.regions.bandwidth()]);
-    // console.log("Max passengers is :", maxPassengers);
+        .rangeRound([0, scales.regions.bandwidth()])
+        .nice();
 
-    // TODO actually draw axes
-
-    let rect = d3.select("#background1");
-    console.assert(rect.size() === 1); // Make sure we just have one thing
-
-    let things = plot.selectAll(".bars")
-        .data(data, function(d) {return d["month"]});
-
-    // Draw new bars for entering data
-    things.enter()
-        .append("rect")
-        .attr("class","bars")
-        .attr("width", d => scales.passengers(d["passengers"]))
-        .attr("x", d => scales.regions(d["geo"]))
-        .attr("y", d => scales.month(d["month"]))
-        .attr("height", scales.month.bandwidth())
-        .style("fill", d => scales.color(d['geo']))
-        .style('stroke', 'white');
 
 
     // Finally, set up axes
@@ -157,8 +130,7 @@ let drawOne = function(data) {
         .attr("class", "axis");
     monthsAxisGroup.call(monthsAxis);
 
-    let regionsAxis = d3.axisTop(scales.regions)
-        // .tickPadding(0);
+    let regionsAxis = d3.axisTop(scales.regions);
 
     axes.regions = regionsAxis;
     let regionsAxisGroup = plot.append("g")
@@ -173,12 +145,56 @@ let drawOne = function(data) {
     axes.passengers = passengersAxis;
     for( let [index, region] of regions.entries() ) {
         let passengersAxisGroup = plot.append("g")
-            .attr("id", "regions-axis")
-            .attr("class", "axis" + index.toString())
+            .attr("class", "regions-axis")
+            .attr("id", "axis" + index.toString())
             .attr("transform", translate(scales.regions(region) ,config.plot.height));
         passengersAxisGroup.call(passengersAxis);
     }
 
+    // Draw gridlines
+    var ygridlines = d3.axisBottom(scales.passengers)
+        .tickFormat("")
+        .tickSize(-config.plot.height)
+        .ticks(3);
+    for (let [index, region] of regions.entries() ) {
+        let passengersAxisGroup = grid.append("g")
+            .attr("class", "gridline")
+            .attr("id", "grid-" + index.toString())
+            .attr("transform", translate(scales.regions(region) ,config.plot.height))
+            .call(ygridlines);
+    }
+
+
+    // Draw actual bars
+    let rect = d3.select("#bars");
+    console.assert(rect.size() === 1); // Make sure we just have one thing
+
+    let things = rect.selectAll(".bars")
+        .data(data, function(d) {return d["month"]});
+
+    // Draw new bars for entering data
+    things.enter()
+        .append("rect")
+        .attr("class","bars")
+        .attr("width", d => scales.passengers(d["passengers"]))
+        .attr("x", d => scales.regions(d["geo"]))
+        .attr("y", d => scales.month(d["month"]))
+        .attr("height", scales.month.bandwidth())
+        .style("fill", d => scales.color(d['geo']))
+        .style('stroke', 'white');
+
+
+    // Draw lines
+    // Draw a line to the left of each region
+    for (let region of regions) {
+        linesGroup.append('line')
+            .style("stroke", "#222")
+            .style("stroke-width", 1)
+            .attr("x1", scales.regions(region))
+            .attr("y1", 0)
+            .attr("x2", scales.regions(region))
+            .attr("y2", config.plot.height);
+    }
 };
 
 /**
