@@ -160,6 +160,7 @@ let drawOne = function(data) {
         let passengersAxisGroup = grid.append("g")
             .attr("class", "gridline")
             .attr("id", "grid-" + index.toString())
+            .attr("style", "color: #BBB")
             .attr("transform", translate(scales.regions(region) ,config.plot.height))
             .call(ygridlines);
     }
@@ -184,17 +185,19 @@ let drawOne = function(data) {
         .style('stroke', 'white');
 
 
-    // Draw lines
-    // Draw a line to the left of each region
-    for (let region of regions) {
-        linesGroup.append('line')
-            .style("stroke", "#222")
-            .style("stroke-width", 1)
-            .attr("x1", scales.regions(region))
-            .attr("y1", 0)
-            .attr("x2", scales.regions(region))
-            .attr("y2", config.plot.height);
-    }
+    // let linesGroup = plot.append("g")
+    //     .attr("class", "lines");
+    // // Draw lines
+    // // Draw a line to the left of each region
+    // for (let region of regions) {
+    //     linesGroup.append('line')
+    //         .style("stroke", "#222")
+    //         .style("stroke-width", 1)
+    //         .attr("x1", scales.regions(region))
+    //         .attr("y1", 0)
+    //         .attr("x2", scales.regions(region))
+    //         .attr("y2", config.plot.height);
+    // }
 };
 
 /**
