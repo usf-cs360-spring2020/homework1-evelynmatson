@@ -2,6 +2,9 @@
     border-width: 2px;
     border-color: #888888;
     border-style: solid;
+    width: 900px;
+    height: 450px;
+    min-width: 900px;
 }
 
 svg {
