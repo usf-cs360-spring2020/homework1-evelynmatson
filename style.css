@@ -1,0 +1,11 @@
+.prototype {
+    border-width: 2px;
+    border-color: #888888;
+    border-style: solid;
+}
+
+svg {
+    border-width: 2px;
+    border-color: #888888;
+    border-style: solid;
+}
