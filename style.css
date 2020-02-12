@@ -7,7 +7,7 @@
     min-width: 900px;
 }
 
-svg {
+.visualization {
     border-width: 2px;
     border-color: #888888;
     border-style: solid;
@@ -16,4 +16,8 @@ svg {
 .content {
     width: 900px;
     max-width: 900px;
+}
+
+.check-list {
+    list-style: none !important;
 }
