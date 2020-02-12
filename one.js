@@ -127,25 +127,27 @@ let drawOne = function(data) {
     axes.months = monthsAxis;
     let monthsAxisGroup = plot.append("g")
         .attr("id", "months-axis")
-        .attr("class", "axis");
+        .attr("class", "axis hidden-ticks");
     monthsAxisGroup.call(monthsAxis);
 
     let regionsAxis = d3.axisTop(scales.regions);
-
     axes.regions = regionsAxis;
     let regionsAxisGroup = plot.append("g")
         .attr("id", "regions-axis")
-        .attr("class", "axis");
+        .attr("class", "axis hidden-ticks");
     regionsAxisGroup.call(regionsAxis);
 
+    let passengerAxesGroup = plot.append("g")
+        .attr("id", "passenger-axes");
     let passengersAxis = d3.axisBottom(scales.passengers)
         // .tickPadding(0)
-        .tickFormat(passengerTicksFormatter)
-        .ticks(3);
+        .tickValues([0,100000,200000])
+        .tickFormat(passengerTicksFormatter);
+        // .ticks(3);
     axes.passengers = passengersAxis;
     for( let [index, region] of regions.entries() ) {
-        let passengersAxisGroup = plot.append("g")
-            .attr("class", "regions-axis")
+        let passengersAxisGroup = passengerAxesGroup.append("g")
+            .attr("class", "axis hidden-ticks")
             .attr("id", "axis" + index.toString())
             .attr("transform", translate(scales.regions(region) ,config.plot.height));
         passengersAxisGroup.call(passengersAxis);
@@ -221,7 +223,7 @@ function monthsFormatter(d) {
  * Helps format the ticks for the passenger count axes.
  */
 function passengerTicksFormatter(d) {
-    if(d === 0 ) {return ""}
+    if(d === 0 ) {return "0"}
     // if(d % 50000 !== 0) {return ""}
     return (d/1000).toString() + "k"
 }
