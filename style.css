@@ -27,23 +27,8 @@
     background: linear-gradient(90deg, rgba(122,55,196,1) 0%, rgba(95,55,196,1) 44%, rgba(41,191,222,1) 100%) !important;
 }
 
-.way-bg {
-    /*background-image: linear-gradient(141deg,#009e6c 0,#00d1b2 71%,#00e7eb 100%) !important;*/
-    background: linear-gradient(90deg, rgba(122,55,196,.5) 0%, rgba(95,55,196,.5) 66%, rgba(41,191,222,.5) 100%) !important;
-    /*padding: 0px 0px;*/
-}
-
-.front-bg {
-    background: white;
-    padding: 20px;
-}
-
 .content {
     margin: auto;
-}
-
-.black-bg {
-    background: #333333;
 }
 
 footer {
