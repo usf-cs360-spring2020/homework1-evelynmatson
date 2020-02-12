@@ -20,9 +20,9 @@ let visualizationOne = function() {
     config.svg.width = 900;   // Golden Ratio!
 
     // svg margins
-    config.margin.top = 25;
-    config.margin.right = 10;
-    config.margin.bottom = 30;
+    config.margin.top = 35;
+    config.margin.right = 20;
+    config.margin.bottom = 35;
     config.margin.left = 70;
 
     // Plot specs

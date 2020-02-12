@@ -12,3 +12,8 @@ svg {
     border-color: #888888;
     border-style: solid;
 }
+
+.content {
+    width: 900px;
+    max-width: 900px;
+}
