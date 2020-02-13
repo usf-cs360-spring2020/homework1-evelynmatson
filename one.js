@@ -1,9 +1,10 @@
 // Global variables because why not
 let scales = {};
 let config = {
-    'svg': {},
-    'margin': {},
-    'plot': {}
+    'svg' : {},
+    'margin' : {},
+    'plot' : {},
+    'legend' : {}
 };
 let svg;
 let axes;
@@ -22,8 +23,17 @@ let visualizationOne = function() {
     // svg margins
     config.margin.top = 35;
     config.margin.right = 20;
-    config.margin.bottom = 35;
+    config.margin.bottom = 100;
     config.margin.left = 70;
+
+    // Legend specs
+    config.legend.squareSize = 15;
+    config.legend.betweenSquares = 5;
+    config.legend.firstSquareX = 5;
+    config.legend.width = config.svg.width;
+    config.legend.height = config.margin.bottom;
+    config.legend.column_width = 225;
+    // config.legend.leftBorder = 5;
 
     // Plot specs
     // (Move the plot right and down by the margin amounts)
@@ -33,7 +43,7 @@ let visualizationOne = function() {
     config.plot.width = config.svg.width - config.margin.left - config.margin.right;
     config.plot.height = config.svg.height - config.margin.top - config.margin.bottom;
 
-    config.plot.paddingBetweenRegions = .2;
+    config.plot.paddingBetweenRegions = .05;
     config.plot.paddingBetweenMonths = .05;
 
     // Set up the SVG
@@ -45,6 +55,14 @@ let visualizationOne = function() {
     plot = svg.append('g');
     plot.attr('id', 'plot1');
     plot.attr('transform', translate(config.plot.x, config.plot.y));
+
+    // Set up a group for the legend
+    let legendGroup = svg.append("g")
+        .attr("id", "legend")
+        .attr('transform', translate(config.margin.left, config.svg.height - config.margin.bottom + 40))
+        .attr('width', config.legend.width)
+        .attr('height', config.legend.height)
+        .attr('fill', 'black');
 
     // Set up a group for gridlines in the svg
     grid = plot.append("g")
@@ -78,10 +96,6 @@ let visualizationOne = function() {
 
     // Setup axes
     axes = {};
-
-
-    // TODO make ticks
-
 
     // Load the data
     let csv = d3.csv("2 2018 enplaned per region per month.csv", convertRow).then(drawOne);
@@ -117,7 +131,6 @@ let drawOne = function(data) {
     scales.passengers.domain([0,maxPassengers])
         .rangeRound([0, scales.regions.bandwidth()])
         .nice();
-
 
 
     // Finally, set up axes
@@ -167,6 +180,34 @@ let drawOne = function(data) {
             .call(ygridlines);
     }
 
+    // Make a legend
+    let legendGroup = d3.select("#legend");
+    let legendKeys = ["Asia", 'Canada', 'Australia / Oceania', 'Central America', 'Europe', 'Mexico',  'Middle East'];
+    let index = 0;
+    for (let region of regions) {
+
+        // Draw a little square
+        legendGroup.append("rect")
+        .attr('class', 'legend-square')
+        .attr('x', config.legend.betweenSquares + (index % 4) * config.legend.column_width)
+        .attr('y', config.legend.firstSquareX + ((index > 3) * (config.legend.squareSize + config.legend.betweenSquares)))
+        .attr('width', config.legend.squareSize)
+        .attr('height', config.legend.squareSize)
+        .style('fill', scales.color(region))
+            .style('stroke', 'white');
+
+        // Draw a little label
+        legendGroup.append("text")
+            .attr('x',  config.legend.betweenSquares*2 + config.legend.squareSize + config.legend.betweenSquares + (index % 4) * config.legend.column_width)
+            .attr('y', config.legend.firstSquareX + ((index > 3) * (config.legend.squareSize + config.legend.betweenSquares)))
+            .style('fill', 'black')
+            .text(region)
+            .attr('text-anchor', 'left')
+            .style('alignment-baseline', 'middle')
+            .attr('font-size', '15px');
+
+        index++;
+        }
 
     // Draw actual bars
     let rect = d3.select("#bars");
@@ -185,21 +226,6 @@ let drawOne = function(data) {
         .attr("height", scales.month.bandwidth())
         .style("fill", d => scales.color(d['geo']))
         .style('stroke', 'white');
-
-
-    // let linesGroup = plot.append("g")
-    //     .attr("class", "lines");
-    // // Draw lines
-    // // Draw a line to the left of each region
-    // for (let region of regions) {
-    //     linesGroup.append('line')
-    //         .style("stroke", "#222")
-    //         .style("stroke-width", 1)
-    //         .attr("x1", scales.regions(region))
-    //         .attr("y1", 0)
-    //         .attr("x2", scales.regions(region))
-    //         .attr("y2", config.plot.height);
-    // }
 };
 
 /**
