@@ -60,6 +60,14 @@ function visualizationThree() {
  */
 function drawThree(data) {
     console.log(data);
+
+    // Stack the data
+    // let stackKeys = data
+    //     .map(r => r.terminal)
+    //     .unique()
+    //     .sort();
+    let stackKeys = ['Terminal 1', 'Terminal 2', 'Terminal 3', 'International'];
+    let stack = d3.stack().keys(stackKeys);
 }
 
 // HELPER METHODS
@@ -111,5 +119,17 @@ function convertRow(row) {
 function translate(x, y) {
     return 'translate(' + x + ',' + y + ')';
 }
+
+/**
+ * Helpful unique-ing function
+ * @returns {*[]} an array with only the unique elements of the array it was called on
+ * @source https://coderwall.com/p/nilaba/simple-pure-javascript-array-unique-method-with-5-lines-of-code
+ */
+Array.prototype.unique = function() {
+    return this.filter(function (value, index, self) {
+        return self.indexOf(value) === index;
+    });
+};
+
 
 visualizationThree();
