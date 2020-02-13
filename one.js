@@ -184,7 +184,7 @@ let drawOne = function(data) {
     let legendGroup = d3.select("#legend");
     let legendKeys = ["Asia", 'Canada', 'Australia / Oceania', 'Central America', 'Europe', 'Mexico',  'Middle East'];
     let index = 0;
-    for (let region of regions) {
+    for (let region of legendKeys) {
 
         // Draw a little square
         legendGroup.append("rect")
@@ -199,7 +199,7 @@ let drawOne = function(data) {
         // Draw a little label
         legendGroup.append("text")
             .attr('x',  config.legend.betweenSquares*2 + config.legend.squareSize + config.legend.betweenSquares + (index % 4) * config.legend.column_width)
-            .attr('y', config.legend.firstSquareX + ((index > 3) * (config.legend.squareSize + config.legend.betweenSquares)))
+            .attr('y', config.legend.firstSquareX + ((index > 3) * (config.legend.squareSize + config.legend.betweenSquares)) + config.legend.squareSize / 2)
             .style('fill', 'black')
             .text(region)
             .attr('text-anchor', 'left')
