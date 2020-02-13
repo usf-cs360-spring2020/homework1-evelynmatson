@@ -12,9 +12,9 @@ let plot;
 let grid;
 
 /**
- * This function will draw the first visualization.
+ * This function will draw the second visualization.
  */
-let visualizationOne = function() {
+let visualizationTwo = function() {
 
     // Specs of the svg
     config.svg.height = 450;
@@ -70,7 +70,7 @@ let visualizationOne = function() {
         // .attr('transform', translate(config.plot.x, config.plot.y))
         .attr("class", "gridlines");
 
-    // Set up a rect inside the g for bars
+    // Set up a group inside the g for bars
     let rect = plot.append('g')
         .attr('id', 'bars')
         .attr('x', 0)
@@ -110,7 +110,6 @@ let drawOne = function(data) {
 
     data = data
         .filter(d => d['geo'] !== 'US'); // Filter out US data because it's too large
-
 
     // Work on scales
     let dates = data
@@ -281,10 +280,9 @@ function convertActivityPeriod(monthstring) {
 /**
  * This function converts date values during csv import
  * @param row the row object to convert
- * @param index who knows! I think this is required
  * @returns the converted row
  */
-let convertRow = function(row, index) {
+let convertRow = function(row) {
     let out = {};
 
     out["month"] = convertActivityPeriod(row["Activity Period"]);
@@ -296,7 +294,7 @@ let convertRow = function(row, index) {
     let normalizedDayCount = 30;
 
     let normScalingFactor = normalizedDayCount /  dayCounts[out['month'].getMonth()];
-    console.log(out['month'], dayCounts[out['month'].getMonth()]);
+    // console.log(out['month'], dayCounts[out['month'].getMonth()]);
     out['passengers'] = out['passengers'] * normScalingFactor;
 
     return out;
@@ -312,4 +310,4 @@ function maxOfRegion(a, data) {
         .map(d => d['passengers']));
 }
 
-visualizationOne();
+visualizationTwo();
