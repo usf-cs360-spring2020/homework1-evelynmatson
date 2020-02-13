@@ -47,7 +47,7 @@ let visualizationOne = function() {
     config.plot.paddingBetweenMonths = .05;
 
     // Set up the SVG
-    svg = d3.select("#one");
+    svg = d3.select("#two");
     svg.attr("width", config.svg.width);
     svg.attr("height", config.svg.height);
 
