@@ -9,6 +9,7 @@ let config = {
 let axes = {};
 
 let years;
+let svg;
 /**
  * Set up the third visualization
  */
@@ -22,7 +23,7 @@ function visualizationThree() {
     config.margin.top = 50;
     config.margin.right = 50;
     config.margin.bottom = 50;
-    config.margin.left = 50;
+    config.margin.left = 80;
 
     // Plot config
     config.plot.x = config.margin.left;
@@ -31,11 +32,9 @@ function visualizationThree() {
     config.plot.height = config.svg.height - config.margin.top - config.margin.bottom;
 
     // Set up the SVG
-    let svg = d3.select('#three')
+    svg = d3.select('#three')
         .attr('width', config.svg.width)
         .attr('height', config.svg.height);
-
-
 
     // Set up the gridline groups
     svg.append('g')
@@ -51,17 +50,75 @@ function visualizationThree() {
         .attr('x', config.plot.x)
         .attr('y', config.plot.y);
 
-    // rect for fun
-    // plot.append('rect')
-    //     .attr('width', config.plot.width)
-    //     .attr('height', config.plot.height)
-    //     .attr('x', 0)
-    //     .attr('y', 0)
-    //     .attr('fill', 'pink')
-    //     .attr('stroke', 'purple');
-
     // Load the data
     let csv = d3.csv('3 terminals.csv', convertRow).then(drawThree);
+}
+
+
+/**
+ * Do the worst thing ever. Draw text (axis titles) in d3.
+ */
+function drawTitles() {
+    let xMiddle = config.margin.left + midpoint(scales.years.range());
+    let yMiddle = config.margin.top + midpoint(scales.passengers.range());
+    // console.log(xMiddle);
+
+    // Labels
+    let labels  = svg.append('g')
+        .attr('id', 'labels')
+        .attr('transform', translate(0, 0));
+
+    let x = labels.append('text')
+        .attr('class', 'axis-title')
+        .text("Year")
+        .attr('x', xMiddle)
+        .attr('y', config.plot.height + config.margin.top)
+    .attr('dy', 35);
+
+    let yGroup = labels.append('g')
+        .attr('transform', translate(config.margin.right, yMiddle));
+
+    let y = yGroup.append('text')
+        .attr('class', 'axis-title')
+        .text('Passenger Count (per year)')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('dy', -10)
+        .attr('text-anchor', 'middle')
+        .attr('transform', 'rotate(-90)');
+}
+
+/**
+ * Draw some labels (still terrible)
+ */
+function drawLabels() {
+    let labelsG = svg.append('g')
+        .attr('id', 'labels-group')
+        .attr('transform', translate(config.margin.left + config.plot.width, config.margin.top));
+
+    labelsG.append('text')
+        .attr('x', -20)
+        .attr('y', 90)
+        .attr('text-anchor', 'end')
+        .text('International Terminal');
+
+    labelsG.append('text')
+        .attr('x', -20)
+        .attr('y', 290)
+        .attr('text-anchor', 'end')
+        .text('Terminal 1');
+
+    labelsG.append('text')
+        .attr('x', -20)
+        .attr('y', 208)
+        .attr('text-anchor', 'end')
+        .text('Terminal 2');
+
+    labelsG.append('text')
+        .attr('x', -20)
+        .attr('y', 150)
+        .attr('text-anchor', 'end')
+        .text('Terminal 3');
 }
 
 /**
@@ -146,6 +203,8 @@ function drawThree(rawdata) {
     scales.color = d3.scaleOrdinal(d3.schemeCategory10)
         .domain(terms);
 
+    drawTitles();
+    drawLabels();
 
     // Draw the paths
     let plot = d3.select('#plot');
@@ -349,6 +408,14 @@ Array.prototype.unique = function() {
         return self.indexOf(value) === index;
     });
 };
+
+/*
+ * calculates the midpoint of a range given as a 2 element array
+ * @source Sophie! Thank you.
+ */
+function midpoint(range) {
+    return range[0] + (range[1] - range[0]) / 2.0;
+}
 
 /**
  * Helper function to make a unique set of dates
