@@ -59,7 +59,7 @@ function visualizationThree() {
  * Draw the third visualization once the data is loaded
  */
 function drawThree(rawdata) {
-    console.log(rawdata);
+    console.log('Loaded', rawdata);
 
     // Turn "long" data into "wide" data
 //     let nest = d3.nest()
@@ -103,24 +103,50 @@ function drawThree(rawdata) {
     data.term2 = rawdata.filter(d => d.terminal === 'Terminal 2');
     data.term3 = rawdata.filter(d => d.terminal === 'Terminal 3');
     data.termintl = rawdata.filter(d => d.terminal === 'International Terminal');
-    console.log(data);
+    console.log('Split', data);
 
     let months = filterUniqueDates(rawdata.map(row => row.month));
     months.sort((a,b) => a - b);
-    console.log(months);
+    console.log('Months', months);
 
 
-    data.stacked = [];
-    for(let row of rawdata) {
-        let building = {};
-        building.term1 = // TODO, using ternary
-        building.term1 = // TODO
-        building.term1 = // TODO
-        building.term1 = // TODO
-        building.month = // TODO
-        data.stacked.add(building);
+    // Make a map of months to terminal passenger counts
+    stackedMap = new Map();
+    for (let month of months) {
+        // Make sure the map has an object for each month
+        if (!stackedMap.has(month.toString())) {
+            stackedMap.set(month.toString(), {
+                term1 : 0,
+                term2 : 0,
+                term3 : 0,
+                intl : 0,
+                month: month
+            });
+        }
     }
-    console.log(data.stacked);
+    for (let row of rawdata) {
+        // console.log(row);
+        switch (row.terminal) {
+            case 'Terminal 1':
+                // console.log(data.stacked.get(row.month.toString()))
+                stackedMap.get(row.month.toString()).term1 += row.count;
+                break;
+            case 'Terminal 2':
+                // console.log(data.stacked.get(row.month.toString()))
+                stackedMap.get(row.month.toString()).term2 += row.count;
+                break;
+            case 'Terminal 3':
+                // console.log(data.stacked.get(row.month.toString()))
+                stackedMap.get(row.month.toString()).term3 += row.count;
+                break;
+            case 'International Terminal':
+                // console.log(data.stacked.get(row.month.toString()))
+                stackedMap.get(row.month.toString()).intl += row.count;
+                break
+        }
+    }
+    data.stacked = new Array(...stackedMap.values());
+    console.log('Stacked', data.stacked);
 
 }
 
