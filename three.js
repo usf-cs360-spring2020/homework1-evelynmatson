@@ -58,16 +58,62 @@ function visualizationThree() {
 /**
  * Draw the third visualization once the data is loaded
  */
-function drawThree(data) {
+function drawThree(rawdata) {
+    console.log(rawdata);
+
+    // Turn "long" data into "wide" data
+//     let nest = d3.nest()
+//         .key(d => d.month.toString())
+//         .entries(data);
+//     console.log(nest);
+//
+//     // let nicerNest = nest.reduce(function(map, obj) {
+//     //     let value = {};
+//     //     obj.values.forEach(function (item) {
+//     //         value[item.terminal] = item.count;
+//     //     });
+//     //     map[obj.values[0]['month']] = obj.val;
+//     //     return map;
+//     // }, {});
+//     // console.log(nicerNest);
+//     //
+//
+//     // console.log(result);
+// // { foo:'bar', hello:'world' }
+//
+//     // Merge data one object per month, with a property for each terminal
+//
+//     // Stack the data
+//     // let stackKeys = data
+//     //     .map(r => r.terminal)
+//     //     .unique()
+//     //     .sort();
+//     let stackKeys = ['Terminal 1', 'Terminal 2', 'Terminal 3', 'International'];
+//     let stack = d3.stack()
+//         .keys(stackKeys);
+//         // .value((d, key) => {
+//         //     return d[]
+//         // });
+//     let stackedValues = stack(nest);
+//     console.log(stackedValues)
+
+    // Make some data
+    let data = {};
+    data.term1 = rawdata.filter(d => d.terminal === 'Terminal 1');
+    data.term2 = rawdata.filter(d => d.terminal === 'Terminal 2');
+    data.term3 = rawdata.filter(d => d.terminal === 'Terminal 3');
+    data.termintl = rawdata.filter(d => d.terminal === 'International Terminal');
     console.log(data);
 
-    // Stack the data
-    // let stackKeys = data
-    //     .map(r => r.terminal)
-    //     .unique()
-    //     .sort();
-    let stackKeys = ['Terminal 1', 'Terminal 2', 'Terminal 3', 'International'];
-    let stack = d3.stack().keys(stackKeys);
+    let months = filterUniqueDates(rawdata.map(row => row.month));
+    months.sort((a,b) => a - b);
+    console.log(months);
+
+
+    data.stacked = [];
+    for(let row of rawdata) {
+    }
+
 }
 
 // HELPER METHODS
@@ -93,6 +139,7 @@ function normalizeCountByMonth(date, count) {
     let normalizedDayCount = 30;
 
     let normScalingFactor = normalizedDayCount /  dayCounts[date.getMonth()];
+    return count * normScalingFactor;
 }
 
 /**
@@ -101,15 +148,17 @@ function normalizeCountByMonth(date, count) {
  * @returns {{}} an object containing the same info
  */
 function convertRow(row) {
+    // console.log(row);
     let out = {};
 
     out.month = convertActivityPeriod(row['Activity Period']);
     out.terminal = row['Terminal'];
-    out.count = row['Passenger Count'];
+    out['count'] = parseInt(row['Passenger Count']);
 
     // Wrangle the data to normalize to a 30-day month
     out.count = normalizeCountByMonth(out.month, out.count);
 
+    // console.log(out);
     return out;
 }
 
@@ -130,6 +179,26 @@ Array.prototype.unique = function() {
         return self.indexOf(value) === index;
     });
 };
+
+/**
+ * Helper function to make a unique set of dates
+ * @param data the dates to filter
+ * @returns {*} a new list with just unique elements
+ * @source https://stackoverflow.com/questions/40346773/unique-array-for-dates-javascript
+ */
+function filterUniqueDates(data) {
+    const lookup = new Set();
+
+    return data.filter(date => {
+        const serialised = date.getTime();
+        if (lookup.has(serialised)) {
+            return false;
+        } else {
+            lookup.add(serialised);
+            return true;
+        }
+    })
+}
 
 
 visualizationThree();
