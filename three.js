@@ -61,8 +61,8 @@ function visualizationThree() {
  */
 function drawThree(rawdata) {
     console.log('Loaded (rawData)', rawdata);
-
     rawdata = process(rawdata);
+    console.log('processed', rawdata);
 
     // Process the data
     let months = filterUniqueDates(rawdata.map(row => row.month));
@@ -201,7 +201,7 @@ function drawThree(rawdata) {
         .style('fill', function(d, i, data) {
             // console.log('in fill func, i is', i);
             let thing = terms[i]
-            return scales.color(terms[i]);      // TODO change
+            return scales.color(terms[i]);
         })
         .attr('d', newArea);
 
@@ -217,16 +217,16 @@ function process(raw) {
 
     let term1 = raw.filter(row => row.terminal === terms[0]);
     let term1Out = []
-    console.log('term1', term1);
+    // console.log('term1', term1);
     let term2 = raw.filter(row => row.terminal === terms[1]);
     let term2Out = []
-    console.log('term2', term2);
+    // console.log('term2', term2);
     let term3 = raw.filter(row => row.terminal === terms[2]);
     let term3Out = []
-    console.log('term3', term3);
+    // console.log('term3', term3);
     let intl = raw.filter(row => row.terminal === terms[3]);
     let intlOut = []
-    console.log('intl', intl);
+    // console.log('intl', intl);
 
     let years = [];
     for (let i = 0; i <= 12; i++) {
@@ -257,6 +257,7 @@ function process(raw) {
 
     for (const row of raw) {
         for (const [index, year] of years.entries()) {
+            // console.log('boop', row);
             // console.log('year', year, typeof year);
             if (row.month.getFullYear() === year.getFullYear()) {
                 switch (row.terminal) {
@@ -269,7 +270,8 @@ function process(raw) {
                     case "Terminal 3":
                         term3Out[index].count += row.count;
                         break;
-                    case "International Terminal":
+                    case "International":
+                        // console.log('boop');
                         intlOut[index].count += row.count;
                         break;
                 }
