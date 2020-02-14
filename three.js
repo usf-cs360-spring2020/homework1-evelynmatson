@@ -238,12 +238,12 @@ function drawThree(rawData) {
         .reduce(function (a, b) {
             return a < b ? a : b;
         });
-    console.log('min date', minDate, typeof minDate);
+    // console.log('min date', minDate, typeof minDate);
     let maxDate = months
         .reduce(function (a, b) {
             return a > b ? a : b;
         });
-    console.log('max date', maxDate, typeof maxDate);
+    // console.log('max date', maxDate, typeof maxDate);
     scales.years = d3.scaleLinear()
         .domain([minDate, maxDate])
         .range([0, config.plot.width]);
@@ -296,15 +296,15 @@ function drawThree(rawData) {
     axes.y.tickFormat('');
     yGridGroup.call(axes.y);
 
+    // console.log('years', years);
+    let yearsThing = years.map(d => d.getTime());
+    console.log('yearsThing', ...yearsThing);
     axes.x = d3.axisBottom()
         .scale(scales.years)
-        .ticks(years)
+        .tickValues(yearsThing)
+        // .ticks(6)
         .tickFormat(d => {
-            // if (d3.timeYear(date) < date) {
-            //     return d3.timeFormat('%b')(date);
-            // } else {
-            //     return d3.timeFormat('%Y')(date);
-            // }
+            console.log('tick', d);
             let date = new Date(d);
             return date.getFullYear();
         });
@@ -334,7 +334,7 @@ function process(raw) {
     // let intl = raw.filter(row => row.terminal === terms[3]);
     let intlOut = [];
 
-    let years = [];
+    years = [];
     for (let i = 0; i <= 12; i++) {
         years.push(new Date(i + 2006, 0));
         // console.log('year', years[i], typeof years[i]);
