@@ -8,6 +8,7 @@ let config = {
 };
 let axes = {};
 
+let years;
 /**
  * Set up the third visualization
  */
@@ -34,6 +35,13 @@ function visualizationThree() {
         .attr('width', config.svg.width)
         .attr('height', config.svg.height);
 
+
+
+    // Set up the gridline groups
+    svg.append('g')
+        .attr('id', 'yGrid')
+        .attr('transform', translate(config.plot.x, config.plot.y));
+
     // Set up the plot area
     let plot = svg.append('g')
         .attr('width', config.plot.width)
@@ -44,13 +52,13 @@ function visualizationThree() {
         .attr('y', config.plot.y);
 
     // rect for fun
-    plot.append('rect')
-        .attr('width', config.plot.width)
-        .attr('height', config.plot.height)
-        .attr('x', 0)
-        .attr('y', 0)
-        .attr('fill', 'pink')
-        .attr('stroke', 'purple');
+    // plot.append('rect')
+    //     .attr('width', config.plot.width)
+    //     .attr('height', config.plot.height)
+    //     .attr('x', 0)
+    //     .attr('y', 0)
+    //     .attr('fill', 'pink')
+    //     .attr('stroke', 'purple');
 
     // Load the data
     let csv = d3.csv('3 terminals.csv', convertRow).then(drawThree);
@@ -60,16 +68,16 @@ function visualizationThree() {
  * Draw the third visualization once the data is loaded
  */
 function drawThree(rawdata) {
-    console.log('Loaded (rawData)', rawdata);
+    // console.log('Loaded (rawData)', rawdata);
     rawdata = process(rawdata);
-    console.log('processed', rawdata);
+    // console.log('processed', rawdata);
 
     // Process the data
     let months = filterUniqueDates(rawdata.map(row => row.month));
     months.sort((a,b) => a - b);
-    console.log('Months', months);
+    // console.log('Months', months);
 
-    // Make a map of months to terminal passenger counts (prep for stacking)
+    // Pre-stack .Make a map of months to terminal passenger counts
     let stackedMap = new Map();
     for (let month of months) {
         // Make sure the map has an object for each month
@@ -105,13 +113,13 @@ function drawThree(rawdata) {
         }
     }
     let preStacked = new Array(...stackedMap.values());
-    console.log('Pre-stacked', preStacked);
+    // console.log('Pre-stacked', preStacked);
 
     // Actually stack
     let stacker = d3.stack()
         .keys(["term3", "term2", "term1", "intl"]);
     let stack  = stacker(preStacked);
-    console.log('stacked', stack);
+    // console.log('stacked', stack);
 
 
     // Work on the scales
@@ -124,12 +132,12 @@ function drawThree(rawdata) {
         .reduce(function (a, b) {
             return a < b ? a : b;
         });
-    console.log('min date', minDate);
+    // console.log('min date', minDate);
     let maxDate = months
         .reduce(function (a, b) {
             return a > b ? a : b;
         });
-    console.log('max date', maxDate);
+    // console.log('max date', maxDate);
     scales.years = d3.scaleLinear()
         .domain([minDate, maxDate])
         .range([0, config.plot.width]);
@@ -139,58 +147,20 @@ function drawThree(rawdata) {
         .domain(terms);
 
 
-    // Draw some stuff?
+    // Draw the paths
     let plot = d3.select('#plot');
     let draw = plot.append('g')
-        .attr('id', 'draw');
-
-    let oneoneone = d3.area()
-        .x(d =>scales.years(d))
-        .y0(200)
-        .y1(150);
-
-
-    // let area = d3.area()
-    //     .x(function (d, index, data) {
-    //         console.log('indexpizza', index)
-    //         scales.years(months[index - 1]);
-    //     })
-    //     .y0(d => scales.passengers(d[0]))
-    //     .y1(d => scales.passengers(d[1]));
-
-    // let drawing = draw.selectAll('.fancy')
-    //     .data(months)
-    //     .enter()
-    //     .append('g');
-    //     // .append('class', 'fancy');
-    //
-    // drawing.append('path')
-    //     .attr('class', 'area')
-    //     .attr('d', oneoneone);
-    //     // .style('fill', d => scales.color())
+        .attr('id', 'drawing');
 
     let newArea = d3.area()
         .x(function(d, i, data) {
-            // console.log('in x, d = ', d);
-            // console.log('in x, i = ', i);
-            // console.log('in x, data = ', data);
-            // console.log('in x, TRYING = ', months[i]);
-            // console.log('from x, returning', scales.years(months[i]));
             return scales.years(months[i]);
-            // return (d.data.key);
         })
         .y0(function(d) {
-            // console.log('in y, d = ', d);
-            // console.log('from y0, returning', scales.passengers(d[0]));
-
             return scales.passengers(d[0]);
-            // return y(d[0]);
         })
         .y1(function(d) {
-            // console.log('from y1, returning', scales.passengers(d[1]));
-
             return scales.passengers(d[1]);
-            // return y(d[1]);
         });
     // Shoutout https://www.d3-graph-gallery.com/graph/stackedarea_basic.html
 
@@ -199,11 +169,34 @@ function drawThree(rawdata) {
         .enter()
         .append('path')
         .style('fill', function(d, i, data) {
-            // console.log('in fill func, i is', i);
             let thing = terms[i]
             return scales.color(terms[i]);
         })
         .attr('d', newArea);
+
+    // Axes
+    axes.y = d3.axisLeft()
+        .scale(scales.passengers)
+        .ticks(6, 's');
+    let yAxisGroup = d3.select('#plot')
+        .append('g')
+        .attr('id', 'yAxis');
+    yAxisGroup.call(axes.y);
+    let yGridGroup = d3.select('#yGrid');
+    axes.y.tickSize(-config.plot.width);
+    axes.y.tickFormat('');
+    yGridGroup.call(axes.y);
+
+    axes.x = d3.axisBottom()
+        .scale(scales.years)
+        .ticks(...years)
+        // .tickFormat(d => d.toString());
+    let xAxisGroup = d3.select('#plot')
+        .append('g')
+        .attr('id', 'xAxis')
+    .attr('transform', translate(0, config.plot.height));
+    xAxisGroup.call(axes.x)
+
 
 }
 
@@ -213,20 +206,15 @@ function drawThree(rawdata) {
 function process(raw) {
     let terms = ["Terminal 1", "Terminal 2", "Terminal 3", "International Terminal"]
 
-    // let out = []
 
     let term1 = raw.filter(row => row.terminal === terms[0]);
     let term1Out = []
-    // console.log('term1', term1);
     let term2 = raw.filter(row => row.terminal === terms[1]);
     let term2Out = []
-    // console.log('term2', term2);
     let term3 = raw.filter(row => row.terminal === terms[2]);
     let term3Out = []
-    // console.log('term3', term3);
     let intl = raw.filter(row => row.terminal === terms[3]);
     let intlOut = []
-    // console.log('intl', intl);
 
     let years = [];
     for (let i = 0; i <= 12; i++) {
