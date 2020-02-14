@@ -31,6 +31,12 @@
     max-width: 900px;
 }
 
+.grade-list {
+    margin-bottom: 1em;
+    margin-right: 1em;
+    /*margin-top: 10px;*/
+}
+
 .check-list {
     list-style: none !important;
 }

@@ -21,9 +21,9 @@ let visualizationTwo = function() {
     config.svg.width = 900;   // Golden Ratio!
 
     // svg margins
-    config.margin.top = 35;
+    config.margin.top = 80;
     config.margin.right = 20;
-    config.margin.bottom = 100;
+    config.margin.bottom = 110;
     config.margin.left = 70;
 
     // Legend specs
@@ -59,7 +59,7 @@ let visualizationTwo = function() {
     // Set up a group for the legend
     let legendGroup = svg.append("g")
         .attr("id", "legend")
-        .attr('transform', translate(config.margin.left, config.svg.height - config.margin.bottom + 40))
+        .attr('transform', translate(config.margin.left - 10, config.svg.height - config.margin.bottom + 50))
         .attr('width', config.legend.width)
         .attr('height', config.legend.height)
         .attr('fill', 'black');
@@ -93,6 +93,15 @@ let visualizationTwo = function() {
 
     scales.color = d3.scaleOrdinal(d3.schemeCategory10);
 
+    // Title!
+    svg.append('text')
+        .text('2018 Outgoing International Passenger Counts by Region')
+        .attr('class', 'overall-title')
+        .attr('fill', 'black')
+        .attr('x', config.margin.left + midpoint(scales.regions.range()))
+        .attr('y', config.margin.top)
+        .attr('dy', -40)
+        .attr('text-anchor', 'middle');
 
     // Setup axes
     axes = {};
@@ -164,6 +173,15 @@ let drawOne = function(data) {
             .attr("id", "axis" + index.toString())
             .attr("transform", translate(scales.regions(region) ,config.plot.height));
         passengersAxisGroup.call(passengersAxis);
+
+        let title = passengerAxesGroup.append('text')
+            .text('Passengers')
+            .style('fill', 'black')
+            .style('font-size', '0.7rem')
+            .attr('text-anchor', 'middle')
+            .attr("transform", translate(scales.regions(region) ,config.plot.height))
+            .attr('x', midpoint(scales.passengers.range()))
+            .attr('y', 30);
     }
 
     // Draw gridlines
@@ -205,7 +223,7 @@ let drawOne = function(data) {
             .text(region)
             .attr('text-anchor', 'left')
             .style('alignment-baseline', 'middle')
-            .attr('font-size', '15px');
+            .attr('font-size', '1em');
 
         index++;
         }
@@ -236,7 +254,7 @@ function translate(x, y) {
     return 'translate(' + x + ',' + y + ')';
 }
 
-/*
+/**
  * Convert a data entry to a nice month name
  */
 function monthsFormatter(d) {
@@ -246,7 +264,7 @@ function monthsFormatter(d) {
     return monthNames[d.getMonth()];
 }
 
-/*
+/**
  * Helps format the ticks for the passenger count axes.
  */
 function passengerTicksFormatter(d) {
@@ -301,7 +319,7 @@ let convertRow = function(row) {
 };
 
 
-/*
+/**
  * Finds the largest passenger count for any month for region in data entry a
  */
 function maxOfRegion(a, data) {
@@ -311,3 +329,11 @@ function maxOfRegion(a, data) {
 }
 
 visualizationTwo();
+
+/**
+ * calculates the midpoint of a range given as a 2 element array
+ * @source Sophie! Thank you.
+ */
+function midpoint(range) {
+    return range[0] + (range[1] - range[0]) / 2.0;
+}

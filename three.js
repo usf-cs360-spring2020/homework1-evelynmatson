@@ -173,13 +173,13 @@ function drawLabels() {
 /**
  * Draw the third visualization once the data is loaded
  */
-function drawThree(rawdata) {
-    // console.log('Loaded (rawData)', rawdata);
-    rawdata = process(rawdata);
-    // console.log('processed', rawdata);
+function drawThree(rawData) {
+    // console.log('Loaded (rawData)', rawData);
+    rawData = process(rawData);
+    // console.log('processed', rawData);
 
     // Process the data
-    let months = filterUniqueDates(rawdata.map(row => row.month));
+    let months = filterUniqueDates(rawData.map(row => row.month));
     months.sort((a,b) => a - b);
     // console.log('Months', months);
 
@@ -197,7 +197,7 @@ function drawThree(rawdata) {
             });
         }
     }
-    for (let row of rawdata) {
+    for (let row of rawData) {
         // console.log(row);
         switch (row.terminal) {
             case 'Terminal 1':
@@ -262,7 +262,7 @@ function drawThree(rawdata) {
         .attr('id', 'drawing');
 
     let newArea = d3.area()
-        .x(function(d, i, data) {
+        .x(function(d, i) {
             return scales.years(months[i]);
         })
         .y0(function(d) {
@@ -277,7 +277,7 @@ function drawThree(rawdata) {
         .data(stack)
         .enter()
         .append('path')
-        .style('fill', function(d, i, data) {
+        .style('fill', function(d, i) {
             let thing = terms[i]
             return scales.color(terms[i]);
         })
@@ -325,14 +325,14 @@ function process(raw) {
     let terms = ["Terminal 1", "Terminal 2", "Terminal 3", "International Terminal"]
 
 
-    let term1 = raw.filter(row => row.terminal === terms[0]);
-    let term1Out = []
-    let term2 = raw.filter(row => row.terminal === terms[1]);
-    let term2Out = []
-    let term3 = raw.filter(row => row.terminal === terms[2]);
-    let term3Out = []
-    let intl = raw.filter(row => row.terminal === terms[3]);
-    let intlOut = []
+    // let term1 = raw.filter(row => row.terminal === terms[0]);
+    let term1Out = [];
+    // let term2 = raw.filter(row => row.terminal === terms[1]);
+    let term2Out = [];
+    // let term3 = raw.filter(row => row.terminal === terms[2]);
+    let term3Out = [];
+    // let intl = raw.filter(row => row.terminal === terms[3]);
+    let intlOut = [];
 
     let years = [];
     for (let i = 0; i <= 12; i++) {
@@ -342,22 +342,22 @@ function process(raw) {
             month: years[i],
             terminal: terms[0],
             count: 0
-        })
+        });
         term2Out.push({
             month: years[i],
             terminal: terms[1],
             count: 0
-        })
+        });
         term3Out.push({
             month: years[i],
             terminal: terms[2],
             count: 0
-        })
+        });
         intlOut.push({
             month: years[i],
             terminal: terms[3],
             count: 0
-        })
+        });
     }
     console.log('years', years);
 
@@ -422,8 +422,8 @@ function normalizeCountByMonth(date, count) {
 }
 
 /**
- * Convert a row from the csv to a object containing the same info
- * @param row the row from the csv
+ * Convert a row from the CSV to a object containing the same info
+ * @param row the row from the CSV
  * @returns {{}} an object containing the same info
  */
 function convertRow(row) {
@@ -459,7 +459,7 @@ Array.prototype.unique = function() {
     });
 };
 
-/*
+/**
  * calculates the midpoint of a range given as a 2 element array
  * @source Sophie! Thank you.
  */
