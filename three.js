@@ -20,9 +20,9 @@ function visualizationThree() {
     config.svg.width = 900;   // Golden Ratio!
 
     // SVG margins config
-    config.margin.top = 50;
+    config.margin.top = 60;
     config.margin.right = 50;
-    config.margin.bottom = 50;
+    config.margin.bottom = 90;
     config.margin.left = 80;
 
     // Plot config
@@ -86,6 +86,14 @@ function drawTitles() {
         .attr('dy', -10)
         .attr('text-anchor', 'middle')
         .attr('transform', 'rotate(-90)');
+
+    let top = labels.append('text')
+        .attr('class', 'overall-title')
+        .text('Yearly Outgoing Passenger Volume per Terminal')
+        .attr('x', xMiddle)
+        .attr('y', config.margin.top)
+        .attr('dy', -15)
+        .attr('text-anchor', 'middle');
 }
 
 /**
@@ -97,30 +105,33 @@ function drawLabels() {
         .attr('transform', translate(config.margin.left + config.plot.width, config.margin.top));
 
     labelsG.append('text')
+        .attr('class', 'vis-label')
         .attr('x', -20)
-        .attr('y', 90)
+        .attr('y', 70)
         .attr('text-anchor', 'end')
         .text('International Terminal');
 
     labelsG.append('text')
+        .attr('class', 'vis-label')
         .attr('x', -20)
-        .attr('y', 290)
+        .attr('y', 130)
         .attr('text-anchor', 'end')
-        .text('Terminal 1');
+        .text('Terminal 3');
 
     labelsG.append('text')
+        .attr('class', 'vis-label')
         .attr('x', -20)
-        .attr('y', 208)
+        .attr('y', 180)
         .attr('text-anchor', 'end')
         .text('Terminal 2');
 
     labelsG.append('text')
+        .attr('class', 'vis-label')
         .attr('x', -20)
-        .attr('y', 150)
+        .attr('y', 260)
         .attr('text-anchor', 'end')
-        .text('Terminal 3');
+        .text('Terminal 1');
 }
-
 /**
  * Draw the third visualization once the data is loaded
  */

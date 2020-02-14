@@ -17,6 +17,14 @@
 .hidden-ticks line{
     visibility:hidden;
 }
+
+.overall-title {
+    font-size: 1.5rem;
+}
+
+.vis-label {
+    font-size: .8rem;
+}
 /*Page Styling*/
 .page-content {
     width: 900px;
