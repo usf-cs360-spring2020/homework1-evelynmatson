@@ -112,7 +112,15 @@ function drawThree(rawdata) {
 
     data.stacked = [];
     for(let row of rawdata) {
+        let building = {};
+        building.term1 = // TODO, using ternary
+        building.term1 = // TODO
+        building.term1 = // TODO
+        building.term1 = // TODO
+        building.month = // TODO
+        data.stacked.add(building);
     }
+    console.log(data.stacked);
 
 }
 
