@@ -109,7 +109,7 @@ function drawThree(rawdata) {
 
     // Actually stack
     let stacker = d3.stack()
-        .keys(["term1", "term2", "term3", "intl"]);
+        .keys(["term3", "term2", "term1", "intl"]);
     let stack  = stacker(preStacked);
     console.log('stacked', stack);
 
