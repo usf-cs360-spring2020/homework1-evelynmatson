@@ -1,4 +1,5 @@
 // Global variables because why not
+
 let scales = {};
 let config = {
     'svg' : {},
@@ -10,6 +11,7 @@ let axes = {};
 
 let years;
 let svg;
+let terms;
 /**
  * Set up the third visualization
  */
@@ -20,10 +22,10 @@ function visualizationThree() {
     config.svg.width = 900;   // Golden Ratio!
 
     // SVG margins config
-    config.margin.top = 60;
-    config.margin.right = 50;
+    config.margin.top = 50;
+    config.margin.right = 20;
     config.margin.bottom = 90;
-    config.margin.left = 80;
+    config.margin.left = 70;
 
     // Plot config
     config.plot.x = config.margin.left;
@@ -51,7 +53,7 @@ function visualizationThree() {
         .attr('y', config.plot.y);
 
     // Load the data
-    let csv = d3.csv('3 terminals.csv', convertRow).then(drawThree);
+    let csv = d3.csv('data/3 terminals.csv', convertRow).then(drawThree);
 }
 
 
@@ -83,7 +85,7 @@ function drawTitles() {
         .text('Passenger Count (per year)')
         .attr('x', 0)
         .attr('y', 0)
-        .attr('dy', -10)
+        .attr('dy', 10)
         .attr('text-anchor', 'middle')
         .attr('transform', 'rotate(-90)');
 
@@ -94,6 +96,38 @@ function drawTitles() {
         .attr('y', config.margin.top)
         .attr('dy', -15)
         .attr('text-anchor', 'middle');
+}
+
+/**
+ * make a legend
+ */
+function drawLegend() {
+
+    let dy = 22;
+    let dx = 10;
+    let rectSize = 20;
+    let labelSize = 170;
+
+    let legendG = svg.append("g")
+        .attr("id", "legend")
+        .attr("transform", translate(config.margin.left, config.plot.height + config.margin.top + 30));
+
+    for (let [i, term] of terms.entries()) {
+        legendG.append('rect')
+            .attr('x', i *(labelSize + dx + rectSize))
+            .attr('y', dy)
+            .attr('fill', scales.color(term))
+            .attr('width', rectSize)
+            .attr('height', rectSize);
+
+        legendG.append('text')
+            .text(term)
+            .attr('x', rectSize + dx + (i * (dx + rectSize + labelSize)))
+            .attr('y', dy)
+            .attr('dy', 15)
+            .attr('fill', 'black')
+            .attr('width', labelSize);
+    }
 }
 
 /**
@@ -109,6 +143,7 @@ function drawLabels() {
         .attr('x', -20)
         .attr('y', 70)
         .attr('text-anchor', 'end')
+        .style('fill', 'white')
         .text('International Terminal');
 
     labelsG.append('text')
@@ -116,6 +151,7 @@ function drawLabels() {
         .attr('x', -20)
         .attr('y', 130)
         .attr('text-anchor', 'end')
+        .style('fill', 'white')
         .text('Terminal 3');
 
     labelsG.append('text')
@@ -123,6 +159,7 @@ function drawLabels() {
         .attr('x', -20)
         .attr('y', 180)
         .attr('text-anchor', 'end')
+        .style('fill', 'white')
         .text('Terminal 2');
 
     labelsG.append('text')
@@ -130,6 +167,7 @@ function drawLabels() {
         .attr('x', -20)
         .attr('y', 260)
         .attr('text-anchor', 'end')
+        .style('fill', 'white')
         .text('Terminal 1');
 }
 /**
@@ -210,12 +248,13 @@ function drawThree(rawdata) {
         .domain([minDate, maxDate])
         .range([0, config.plot.width]);
 
-    let terms = ["Terminal 1", "Terminal 2", "Terminal 3", "International Terminal"]
+    terms = ["Terminal 1", "Terminal 2", "Terminal 3", "International Terminal"];
     scales.color = d3.scaleOrdinal(d3.schemeCategory10)
         .domain(terms);
 
     drawTitles();
     drawLabels();
+    drawLegend();
 
     // Draw the paths
     let plot = d3.select('#plot');
