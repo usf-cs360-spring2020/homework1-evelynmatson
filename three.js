@@ -132,12 +132,12 @@ function drawThree(rawdata) {
         .reduce(function (a, b) {
             return a < b ? a : b;
         });
-    // console.log('min date', minDate);
+    console.log('min date', minDate, typeof minDate);
     let maxDate = months
         .reduce(function (a, b) {
             return a > b ? a : b;
         });
-    // console.log('max date', maxDate);
+    console.log('max date', maxDate, typeof maxDate);
     scales.years = d3.scaleLinear()
         .domain([minDate, maxDate])
         .range([0, config.plot.width]);
@@ -189,7 +189,16 @@ function drawThree(rawdata) {
 
     axes.x = d3.axisBottom()
         .scale(scales.years)
-        .ticks(...years)
+        .ticks(years)
+        .tickFormat(d => {
+            // if (d3.timeYear(date) < date) {
+            //     return d3.timeFormat('%b')(date);
+            // } else {
+            //     return d3.timeFormat('%Y')(date);
+            // }
+            let date = new Date(d);
+            return date.getFullYear();
+        });
         // .tickFormat(d => d.toString());
     let xAxisGroup = d3.select('#plot')
         .append('g')
