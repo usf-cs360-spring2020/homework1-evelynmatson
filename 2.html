@@ -134,7 +134,7 @@
           My second visualization for homework 1.
         </p>
 
-        <h5>2018 Outgoing International Passenger Counts by Region</h5>
+<!--        <h5>2018 Outgoing International Passenger Counts by Region</h5>-->
         <svg id="two" class="visualization"></svg>
         <script src="two.js"></script>
         <p><em>Implemented with <a href="https://d3js.org">D3.js v5</a>.</em></p>
@@ -144,7 +144,7 @@
         <p>Here, passenger count is encoded by horizontal length of the bar, month is encoded by vertical position of the bar, region is encoded by horizontal position of the subchart (as well as by color). Longer bars represent higher air traffic volumes to a given region during a given month.</p>
 
         <h3>Data Wrangling</h3>
-        <p>Using the DataSF website, I reduced the dataset down to just the columns I needed (reduced dataset available <a href="2%202018%20enplaned%20per%20region%20per%20month.csv">here</a>), by summing rows (a 'roll-up' operation). Then, I added javascript code to this site to normalize the passenger counts by month to all reflect an ideal 30-day month. This meant slightly reducing the passenger count for 31-day months, and slightly increasing the passenger count for 28-day months, so that comparison between months would reflect only changing air traffic patterns, rather than the differences in month lengths. </p>
+        <p>Using the DataSF website, I reduced the dataset down to just the columns I needed (reduced dataset available <a href="data/2%202018%20enplaned%20per%20region%20per%20month.csv">here</a>), by summing rows (a 'roll-up' operation). Then, I added javascript code to this site to normalize the passenger counts by month to all reflect an ideal 30-day month. This meant slightly reducing the passenger count for 31-day months, and slightly increasing the passenger count for 28-day months, so that comparison between months would reflect only changing air traffic patterns, rather than the differences in month lengths. </p>
 
         <h3>Conclusions</h3>
         <p>One trend I noticed in the visualization is that more people travel to Europe more during months that are warm in the northern hemisphere (June, July, August), and more people travel to Australia/Oceania during months that are warm in the southern hemisphere (Novemer, December, January). I guess people like warm weather!</p>

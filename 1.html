@@ -106,7 +106,6 @@
 
         <!-- Right navbar items -->
         <div class="navbar-end">
-          <!-- TODO: Update as needed -->
           <a class="navbar-item" href="grade.html" title="About">
             <span class="icon"><i class="fas fa-tasks"></i></span>
             <span>Grade</span>
@@ -130,26 +129,36 @@
           SFO Domestic vs. International Traffic
         </h1>
         <p class="subtitle">
-          Visualization number 1 for homework 1.
+          My first visualization for homework 1.
         </p>
-
-        TODO For each visualization you create, you must also include the following writeups:<br>
-
-        TODO How to interpret your visualization, indicating how the data is encoded. For example, “passenger count is encoded by the length of the bar, so longer bars represent higher passenger count.”<br>
-
-        TODO Any per-visualization data wrangling you performed on the original dataset, and how you wrangled the data (e.g. Tableau, Excel, using the website interface). Link to the wrangled data when possible.<br>
-
-        TODO One conclusion you can make about the data using your visualization. The conclusion should ideally be something that a simple statistic could not replace. For example, “airline X has the highest passenger count over this time period” is a simple conclusion that will meet this requirement, but may not earn a plus-level letter grade.<br>
-
 
         <h3>Prototype from Tableau :</h3>
         <img src="1%20captioned.png" class="prototype">
 
-        <br><br>
-        <p>This is a visualization of the monthly amounts of domestic vs. international outgoing air traffic from San Francisco International Airport in 2018, measured by passenger counts. This is visualized as a line graph, where passenger count is encoded by the vertical position of each point, and month is encoded by the horizontal position.</p>
-        <br>
+<!--        TODO For each visualization you create, you must also include the following writeups:<br>-->
+
+<!--        TODO How to interpret your visualization, indicating how the data is encoded. For example, “passenger count is encoded by the length of the bar, so longer bars represent higher passenger count.”<br>-->
+
+<!--        TODO Any per-visualization data wrangling you performed on the original dataset, and how you wrangled the data (e.g. Tableau, Excel, using the website interface). Link to the wrangled data when possible.<br>-->
+
+<!--        TODO One conclusion you can make about the data using your visualization. The conclusion should ideally be something that a simple statistic could not replace. For example, “airline X has the highest passenger count over this time period” is a simple conclusion that will meet this requirement, but may not earn a plus-level letter grade.<br>-->
+
+        <h3>About</h3>
+        <p>This is a line chart that shows how 2018 air traffic volume to international vs. domestic destinations varies by month.</p>
+        <p>Here, passenger count is encoded by vertical position of the line, month is encoded by horizontal position, and region is encoded by the two different lines. Higher values on the chart represent higher air traffic volumes to a given type of destination during a given month.</p>
+
+        <h3>Data Wrangling</h3>
+        <p>Using the DataSF website, I reduced the dataset down to just the columns I needed (reduced dataset available <a href="data/1%202018%20enplaned%20per%20month%20by%20region%20summary.csv">here</a>), by summing rows (a 'roll-up' operation). Then, if i had made a version of this visualization in D3.js, I would have done further wrangling to normalize the passenger counts by month to all reflect an ideal 30-day month. This would mean slightly reducing the passenger count for 31-day months, and slightly increasing the passenger count for 28-day months, so that comparison between months would reflect only changing air traffic patterns, rather than the differences in month lengths. </p>
+
+        <h3>Conclusions</h3>
+        <p>One trend I noticed in the visualization is that travel to international destinations is relatively constant across the year, whereas domestic air traffic varies more and is higher during summer months. I might hypothesize that this reflects the fact that internationally, some destinations experience summer during our winter, resulting in additional air traffic to such destinations during our winter that 'evens out' the trend towards travel during warm months that appears in domestic air traffic data.
 
 
+<!--        <br><br>-->
+<!--        <p>This is a visualization of the monthly amounts of domestic vs. international outgoing air traffic from San Francisco International Airport in 2018, measured by passenger counts. This is visualized as a line graph, where passenger count is encoded by the vertical position of each point, and month is encoded by the horizontal position.</p>-->
+<!--        <br>-->
+
+        <br><br><br>
 
         <!-- Profile box -->
         <!-- https://bulma.io/documentation/layout/media-object/ -->
