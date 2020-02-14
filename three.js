@@ -62,6 +62,8 @@ function visualizationThree() {
 function drawThree(rawdata) {
     console.log('Loaded (rawData)', rawdata);
 
+    rawdata = process(rawdata);
+
     // Process the data
     let months = filterUniqueDates(rawdata.map(row => row.month));
     months.sort((a,b) => a - b);
@@ -118,16 +120,6 @@ function drawThree(rawdata) {
         .range([config.plot.height, 0])
         .nice();
 
-    // let minDateF = function( iter) {
-    //     let current = null;
-    //
-    //     let result = it.next();
-    //     while (!result.done) {
-    //         let val = result.value;
-    //         if val
-    //         result = it.next()
-    //     }
-    // }
     let minDate = months
         .reduce(function (a, b) {
             return a < b ? a : b;
@@ -183,34 +175,116 @@ function drawThree(rawdata) {
             // console.log('in x, i = ', i);
             // console.log('in x, data = ', data);
             // console.log('in x, TRYING = ', months[i]);
-            console.log('from x, returning', scales.years(months[i]));
+            // console.log('from x, returning', scales.years(months[i]));
             return scales.years(months[i]);
             // return (d.data.key);
         })
         .y0(function(d) {
             // console.log('in y, d = ', d);
-            console.log('from y0, returning', scales.passengers(d[0]));
+            // console.log('from y0, returning', scales.passengers(d[0]));
 
             return scales.passengers(d[0]);
             // return y(d[0]);
         })
         .y1(function(d) {
-            console.log('from y1, returning', scales.passengers(d[1]));
+            // console.log('from y1, returning', scales.passengers(d[1]));
 
             return scales.passengers(d[1]);
             // return y(d[1]);
         });
+    // Shoutout https://www.d3-graph-gallery.com/graph/stackedarea_basic.html
 
     draw.selectAll("mylayers")
         .data(stack)
         .enter()
         .append('path')
-        .style('fill', function(d) {
-            let thing = months[d.key-1]
-            return scales.color("Terminal 1");      // TODO change
+        .style('fill', function(d, i, data) {
+            // console.log('in fill func, i is', i);
+            let thing = terms[i]
+            return scales.color(terms[i]);      // TODO change
         })
         .attr('d', newArea);
 
+}
+
+/**
+ * Perform Data wrangling to aggregate by year
+ */
+function process(raw) {
+    let terms = ["Terminal 1", "Terminal 2", "Terminal 3", "International Terminal"]
+
+    // let out = []
+
+    let term1 = raw.filter(row => row.terminal === terms[0]);
+    let term1Out = []
+    console.log('term1', term1);
+    let term2 = raw.filter(row => row.terminal === terms[1]);
+    let term2Out = []
+    console.log('term2', term2);
+    let term3 = raw.filter(row => row.terminal === terms[2]);
+    let term3Out = []
+    console.log('term3', term3);
+    let intl = raw.filter(row => row.terminal === terms[3]);
+    let intlOut = []
+    console.log('intl', intl);
+
+    let years = [];
+    for (let i = 0; i <= 12; i++) {
+        years.push(new Date(i + 2006, 0));
+        // console.log('year', years[i], typeof years[i]);
+        term1Out.push({
+            month: years[i],
+            terminal: terms[0],
+            count: 0
+        })
+        term2Out.push({
+            month: years[i],
+            terminal: terms[1],
+            count: 0
+        })
+        term3Out.push({
+            month: years[i],
+            terminal: terms[2],
+            count: 0
+        })
+        intlOut.push({
+            month: years[i],
+            terminal: terms[3],
+            count: 0
+        })
+    }
+    console.log('years', years);
+
+    for (const row of raw) {
+        for (const [index, year] of years.entries()) {
+            // console.log('year', year, typeof year);
+            if (row.month.getFullYear() === year.getFullYear()) {
+                switch (row.terminal) {
+                    case "Terminal 1":
+                        term1Out[index].count += row.count;
+                        break;
+                    case "Terminal 2":
+                        term2Out[index].count += row.count;
+                        break;
+                    case "Terminal 3":
+                        term3Out[index].count += row.count;
+                        break;
+                    case "International Terminal":
+                        intlOut[index].count += row.count;
+                        break;
+                }
+            }
+        }
+    }
+
+    let out = [];
+    out.push(...term1Out);
+    out.push(...term2Out);
+    out.push(...term3Out);
+    out.push(...intlOut);
+    // console.log('out', out);
+
+    return out
 }
 
 // HELPER METHODS
