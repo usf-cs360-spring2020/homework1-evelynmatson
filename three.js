@@ -37,6 +37,7 @@ function visualizationThree() {
     // Set up the plot area
     let plot = svg.append('g')
         .attr('width', config.plot.width)
+        .attr('id', 'plot')
         .attr('height', config.plot.height)
         .attr('transform', translate(config.plot.x, config.plot.y))
         .attr('x', config.plot.x)
@@ -59,59 +60,15 @@ function visualizationThree() {
  * Draw the third visualization once the data is loaded
  */
 function drawThree(rawdata) {
-    console.log('Loaded', rawdata);
+    console.log('Loaded (rawData)', rawdata);
 
-    // Turn "long" data into "wide" data
-//     let nest = d3.nest()
-//         .key(d => d.month.toString())
-//         .entries(data);
-//     console.log(nest);
-//
-//     // let nicerNest = nest.reduce(function(map, obj) {
-//     //     let value = {};
-//     //     obj.values.forEach(function (item) {
-//     //         value[item.terminal] = item.count;
-//     //     });
-//     //     map[obj.values[0]['month']] = obj.val;
-//     //     return map;
-//     // }, {});
-//     // console.log(nicerNest);
-//     //
-//
-//     // console.log(result);
-// // { foo:'bar', hello:'world' }
-//
-//     // Merge data one object per month, with a property for each terminal
-//
-//     // Stack the data
-//     // let stackKeys = data
-//     //     .map(r => r.terminal)
-//     //     .unique()
-//     //     .sort();
-//     let stackKeys = ['Terminal 1', 'Terminal 2', 'Terminal 3', 'International'];
-//     let stack = d3.stack()
-//         .keys(stackKeys);
-//         // .value((d, key) => {
-//         //     return d[]
-//         // });
-//     let stackedValues = stack(nest);
-//     console.log(stackedValues)
-
-    // Make some data
-    let data = {};
-    data.term1 = rawdata.filter(d => d.terminal === 'Terminal 1');
-    data.term2 = rawdata.filter(d => d.terminal === 'Terminal 2');
-    data.term3 = rawdata.filter(d => d.terminal === 'Terminal 3');
-    data.termintl = rawdata.filter(d => d.terminal === 'International Terminal');
-    console.log('Split', data);
-
+    // Process the data
     let months = filterUniqueDates(rawdata.map(row => row.month));
     months.sort((a,b) => a - b);
     console.log('Months', months);
 
-
-    // Make a map of months to terminal passenger counts
-    stackedMap = new Map();
+    // Make a map of months to terminal passenger counts (prep for stacking)
+    let stackedMap = new Map();
     for (let month of months) {
         // Make sure the map has an object for each month
         if (!stackedMap.has(month.toString())) {
@@ -145,8 +102,114 @@ function drawThree(rawdata) {
                 break
         }
     }
-    data.stacked = new Array(...stackedMap.values());
-    console.log('Stacked', data.stacked);
+    let preStacked = new Array(...stackedMap.values());
+    console.log('Pre-stacked', preStacked);
+
+    // Actually stack
+    let stacker = d3.stack()
+        .keys(["term1", "term2", "term3", "intl"]);
+    let stack  = stacker(preStacked);
+    console.log('stacked', stack);
+
+
+    // Work on the scales
+    scales.passengers = d3.scaleLinear()
+        .domain([0,30000000])
+        .range([config.plot.height, 0])
+        .nice();
+
+    // let minDateF = function( iter) {
+    //     let current = null;
+    //
+    //     let result = it.next();
+    //     while (!result.done) {
+    //         let val = result.value;
+    //         if val
+    //         result = it.next()
+    //     }
+    // }
+    let minDate = months
+        .reduce(function (a, b) {
+            return a < b ? a : b;
+        });
+    console.log('min date', minDate);
+    let maxDate = months
+        .reduce(function (a, b) {
+            return a > b ? a : b;
+        });
+    console.log('max date', maxDate);
+    scales.years = d3.scaleLinear()
+        .domain([minDate, maxDate])
+        .range([0, config.plot.width]);
+
+    let terms = ["Terminal 1", "Terminal 2", "Terminal 3", "International Terminal"]
+    scales.color = d3.scaleOrdinal(d3.schemeCategory10)
+        .domain(terms);
+
+
+    // Draw some stuff?
+    let plot = d3.select('#plot');
+    let draw = plot.append('g')
+        .attr('id', 'draw');
+
+    let oneoneone = d3.area()
+        .x(d =>scales.years(d))
+        .y0(200)
+        .y1(150);
+
+
+    // let area = d3.area()
+    //     .x(function (d, index, data) {
+    //         console.log('indexpizza', index)
+    //         scales.years(months[index - 1]);
+    //     })
+    //     .y0(d => scales.passengers(d[0]))
+    //     .y1(d => scales.passengers(d[1]));
+
+    // let drawing = draw.selectAll('.fancy')
+    //     .data(months)
+    //     .enter()
+    //     .append('g');
+    //     // .append('class', 'fancy');
+    //
+    // drawing.append('path')
+    //     .attr('class', 'area')
+    //     .attr('d', oneoneone);
+    //     // .style('fill', d => scales.color())
+
+    let newArea = d3.area()
+        .x(function(d, i, data) {
+            // console.log('in x, d = ', d);
+            // console.log('in x, i = ', i);
+            // console.log('in x, data = ', data);
+            // console.log('in x, TRYING = ', months[i]);
+            console.log('from x, returning', scales.years(months[i]));
+            return scales.years(months[i]);
+            // return (d.data.key);
+        })
+        .y0(function(d) {
+            // console.log('in y, d = ', d);
+            console.log('from y0, returning', scales.passengers(d[0]));
+
+            return scales.passengers(d[0]);
+            // return y(d[0]);
+        })
+        .y1(function(d) {
+            console.log('from y1, returning', scales.passengers(d[1]));
+
+            return scales.passengers(d[1]);
+            // return y(d[1]);
+        });
+
+    draw.selectAll("mylayers")
+        .data(stack)
+        .enter()
+        .append('path')
+        .style('fill', function(d) {
+            let thing = months[d.key-1]
+            return scales.color("Terminal 1");      // TODO change
+        })
+        .attr('d', newArea);
 
 }
 
