@@ -86,18 +86,18 @@
             <div class="navbar-dropdown">
               <a class="navbar-item"  href="1.html">
                 <span class="icon"><i class="fas fa-chart-line"></i></span>
-                <span>1. Domestic vs. International Traffic</span>
+                <span>Domestic vs. International Traffic</span>
               </a>
               <a class="navbar-item"  href="2.html">
                 <span class="icon"><i class="fas fa-chart-bar"></i></span>
-                <span>2. Intl. by Region</span>
+                <span>Intl. by Region</span>
               </a>
 
               <!-- <hr class="navbar-divider"> -->
 
               <a class="navbar-item is-active"  href="3.html">
                 <span class="icon"><i class="fas fa-chart-area"></i></span>
-                <span>3. Terminal Growth</span>
+                <span>Terminal Growth</span>
               </a>
               <!-- <a class="navbar-item">
                 <span class="icon"><i class="fas fa-chart-pie"></i></span>
@@ -132,65 +132,74 @@
           SFO Terminal Growth
         </h1>
         <p class="subtitle">
-          Visualization number 3 for homework 1.
+          My third visualization for homework 1.
         </p>
 
         <svg id="three" class="visualization"></svg>
         <script src="three.js"></script>
+        <p><em>Implemented with <a href="https://d3js.org">D3.js v5</a>.</em></p>
 
-        TODO For each visualization you create, you must also include the following writeups:<br>
+<!--        DONE For each visualization you create, you must also include the following writeups:<br>-->
 
-        TODO How to interpret your visualization, indicating how the data is encoded. For example, “passenger count is encoded by the length of the bar, so longer bars represent higher passenger count.”<br>
+<!--        DONE How to interpret your visualization, indicating how the data is encoded. For example, “passenger count is encoded by the length of the bar, so longer bars represent higher passenger count.”<br>-->
 
-        TODO Any per-visualization data wrangling you performed on the original dataset, and how you wrangled the data (e.g. Tableau, Excel, using the website interface). Link to the wrangled data when possible.<br>
+<!--        DONE Any per-visualization data wrangling you performed on the original dataset, and how you wrangled the data (e.g. Tableau, Excel, using the website interface). Link to the wrangled data when possible.<br>-->
 
-        TODO One conclusion you can make about the data using your visualization. The conclusion should ideally be something that a simple statistic could not replace. For example, “airline X has the highest passenger count over this time period” is a simple conclusion that will meet this requirement, but may not earn a plus-level letter grade.<br>
+<!--        DONE One conclusion you can make about the data using your visualization. The conclusion should ideally be something that a simple statistic could not replace. For example, “airline X has the highest passenger count over this time period” is a simple conclusion that will meet this requirement, but may not earn a plus-level letter grade.<br>-->
+        <h3>About</h3>
+<!--        <p>This is a small multiples bar chart that shows traffic volume to different geographic regions by month.</p>-->
+<!--        <p>Here, passenger count is encoded by horizontal length of the bar, month is encoded by vertical position of the bar, region is encoded by horizontal position of the subchart (as well as by color). Longer bars represent higher air traffic volumes to a given region during a given month.</p>-->
+        <p>This is a stacked area visualization of the monthly amount of outgoing air traffic per terminal from San Francisco International Airport from 2006 to 2018, measured by passenger counts.</p>
+        <p>Here, passenger count is encoded by vertical area, year is encoded by horizontal position, and region is encoded by color (see legend). Larger area represents a higher number of passengers taking flights out of a given terminal in a given year.</p>
+        <p>When making my D3.js implementation, I omitted the titles for the month and region axes, because I decided they are redundant. It should be inherently clear for any viewer that 'April' and 'October' are months and that 'Asia' and 'Mexico' are regions.</p>
+
+        <h3>Data Wrangling</h3>
+        <p>Using the DataSF website, I reduced the dataset down to just the columns I needed (reduced dataset available <a href="data/2%202018%20enplaned%20per%20region%20per%20month.csv">here</a>), by summing rows (a 'roll-up' operation).</p>
+        <p>Then, I wrote javascript function to sum the passenger counts for all rows representing a given terminal and year, simplifying the data to show only year-over-year changes and hide changes between different months. </p>
+        <p>Finally, I added javascript code to this site to normalize the passenger counts by month to all reflect an ideal 30-day month. This meant slightly reducing the passenger count for 31-day months, and slightly increasing the passenger count for 28-day months, so that comparison between months would reflect only changing air traffic patterns, rather than the differences in month lengths.</p>
+
+        <h3>Conclusions</h3>
+        <p>The first thing that jumped out at me in this visualization is that terminal two was created! Besides that, the visualization seems to show that most of the recent growth at SFO has happened in the International Terminal and Terminal 1.</p>
 
         <h3>Prototype from Tableau :</h3>
         <img src="3%20captioned.png" class="prototype">
 
-        <br><br>
-        <p>This is a visualization of the monthly amount of outgoing air traffic per terminal from San Francisco International Airport in 2018, measured by passenger counts. This is visualized as a stacked area chart, where passenger count is encoded by vertical area, month and year are encoded by horizontal position, and region is encoded by color (see legend).</p>
-
-
-        <br><br><br>
-
-
+<!--        <br><br><br>-->
 
         <!-- Profile box -->
         <!-- https://bulma.io/documentation/layout/media-object/ -->
-        <article class="media">
-          <figure class="media-left">
-            <p class="image is-128x128"><img class="is-rounded" src="profile.jpg"></p>
-          </figure>
+<!--        <article class="media">-->
+<!--          <figure class="media-left">-->
+<!--            <p class="image is-128x128"><img class="is-rounded" src="profile.jpg"></p>-->
+<!--          </figure>-->
 
-          <div class="media-content">
-            <div class="content">
-              <p>
-                <strong>Eve Matson</strong><br/>
-                Computer Science Major, <a href="https://www.usfca.edu/">University of San Francisco</a><br/>
-                <em>Expected Graduation: 2021</em><br/>
-                <i class="fas fa-envelope" style="margin-right: 3px"></i> <a href="mailto:ematson@dons.usfca.edu">ematson@dons.usfca.edu</a>
-                <i class="fab fa-github" style="margin-left: 10px; margin-right: 3px"></i> <a href="https://github.com/evelynmatson">evelynmatson</a>
-              </p>
+<!--          <div class="media-content">-->
+<!--            <div class="content">-->
+<!--              <p>-->
+<!--                <strong>Eve Matson</strong><br/>-->
+<!--                Computer Science Major, <a href="https://www.usfca.edu/">University of San Francisco</a><br/>-->
+<!--                <em>Expected Graduation: 2021</em><br/>-->
+<!--                <i class="fas fa-envelope" style="margin-right: 3px"></i> <a href="mailto:ematson@dons.usfca.edu">ematson@dons.usfca.edu</a>-->
+<!--                <i class="fab fa-github" style="margin-left: 10px; margin-right: 3px"></i> <a href="https://github.com/evelynmatson">evelynmatson</a>-->
+<!--              </p>-->
 
-              <p>
-                I am a junior Computer Science Major at USF, and expect to graduate in May 2021. I'm from Seattle and enjoy doing computer science, physics and theatre!
-              </p>
+<!--              <p>-->
+<!--                I am a junior Computer Science Major at USF, and expect to graduate in May 2021. I'm from Seattle and enjoy doing computer science, physics and theatre!-->
+<!--              </p>-->
 
-              <div class="heading">Skills</div>
+<!--              <div class="heading">Skills</div>-->
 
-              <div class="tags">
-                <span class="tag">Java</span>
-                <span class="tag">Python</span>
-                <span class="tag">C</span>
-                <span class="tag">JavaScript</span>
-                <span class="tag">HTML</span>
-                <span class="tag">CSS</span>
-              </div>
-            </div>
-          </div>
-        </article>
+<!--              <div class="tags">-->
+<!--                <span class="tag">Java</span>-->
+<!--                <span class="tag">Python</span>-->
+<!--                <span class="tag">C</span>-->
+<!--                <span class="tag">JavaScript</span>-->
+<!--                <span class="tag">HTML</span>-->
+<!--                <span class="tag">CSS</span>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </article>-->
         <!-- End profile box -->
 
       </div>
